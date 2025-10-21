@@ -6,7 +6,7 @@ export enum gameModes {
 }
 
 export class SoSGame {
-    private board: Board
+    public board: Board
     private gameMode: gameModes 
 
     constructor(gameMode: gameModes = gameModes.Simple) {
