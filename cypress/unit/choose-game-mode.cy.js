@@ -14,6 +14,18 @@ describe("AC 2.2: Choosing the Simple Game mode", () => {
     
     sosGame.setGameMode(gameModes.General)
 
+    sosGame.setGameMode(gameModes.Simple)
+
+    expect(sosGame.getGameMode()).to.equal(gameModes.Simple);
+  });
+});
+
+describe("AC 2.2: Choosing the General Game mode", () => {
+  it("should change game mode to general", () => {
+    const sosGame = new SoSGame()
+    
+    sosGame.setGameMode(gameModes.General)
+
     expect(sosGame.getGameMode()).to.equal(gameModes.General);
   });
 });
