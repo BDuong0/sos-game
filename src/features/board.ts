@@ -30,4 +30,12 @@ export class Board {
     this.grid = Array.from({ length: this.rows }, () => Array(this.columns).fill(0));
     this.size = [this.rows, this.columns];
   }
+
+  public getCellValue(rowIndex: number, columnIndex: number) {
+    return this.grid[rowIndex][columnIndex]
+  }
+
+  public editCellValue(rowIndex: number, columnIndex: number, value: number) {
+    this.grid[rowIndex][columnIndex] = value
+  }
 }
