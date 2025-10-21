@@ -27,7 +27,12 @@ function App() {
   
   const selectGameMode = (e: ChangeEvent<HTMLInputElement>) => {
     const setGameMode = e.target.value
-    console.log(setGameMode)
+
+    if (setGameMode == "SIMPLE") {
+      sosGame.setGameMode(gameModes.Simple)
+    } else {
+      sosGame.setGameMode(gameModes.General)
+    }
   }
 
   return (
