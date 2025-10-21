@@ -21,7 +21,13 @@ export class Board {
         return true
     } else {
         return false
-    }
-    
+    }   
+  }
+
+  public setBoardSize(rowCount: number, columnCount: number) {
+    this.rows = rowCount;
+    this.columns = columnCount;
+    this.grid = Array.from({ length: this.rows }, () => Array(this.columns).fill(0));
+    this.size = [this.rows, this.columns];
   }
 }
