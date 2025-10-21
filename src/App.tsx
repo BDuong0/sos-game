@@ -17,6 +17,7 @@ const BOARD_SIZES = [
 function App() {
   // const [displayedSize, setDisplayedSize] = useState(sosBoard.size)
   const [displayedSize, setDisplayedSize] = useState(sosGame.board.size)
+  const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurn())
   
   const selectBoardSize = (e: ChangeEvent<HTMLSelectElement>) => {
     const boardSize = Number(e.target.value)
@@ -40,10 +41,10 @@ function App() {
       <ThreeColumnLayout layoutLevel="root" gap="16px">
         <ThreeColumnLayout.LeftColumn columnPercent={25}>
           <p>Blue Player</p>
-          <form>
-            <label><input type='radio' name="blue-player-letter" value="S" defaultChecked></input>S</label>
-            <label><input type='radio' name="blue-player-letter" value="O"></input>O</label>
-          </form>
+          
+          <label><input type='radio' name="blue-player-symbol" value="S" defaultChecked={true}></input>S</label>
+          <label><input type='radio' name="blue-player-symbol" value="O"></input>O</label>
+          
         </ThreeColumnLayout.LeftColumn>
 
         <ThreeColumnLayout.MiddleColumn columnPercent={50}>
@@ -68,15 +69,18 @@ function App() {
 
           <div>
             <span className="hidden">{displayedSize}</span>
-            <SoSBoard sosBoard={sosGame.board}/>
+            <SoSBoard sosGame={sosGame} setDisplayedPlayersTurn={setDisplayedPlayersTurn}/>
           </div>
 
-          <p>Current Turn: {sosGame.getWhoseTurn() == 1 ? <p>Blue Player</p> : <p>Red Player</p>}</p>
+          <p>Current Turn: {displayedPlayersTurn == 1 ? <span>Blue Player</span> : <span>Red Player</span>}</p>
 
         </ThreeColumnLayout.MiddleColumn>
 
         <ThreeColumnLayout.RightColumn columnPercent={25}>
           <p>Red Player Column</p>
+
+          <label><input type='radio' name="red-player-symbol" value="S"></input>S</label>
+          <label><input type='radio' name="red-player-symbol" value="O" defaultChecked={true}></input>O</label>
         </ThreeColumnLayout.RightColumn>
       </ThreeColumnLayout>
     </main>
