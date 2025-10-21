@@ -1,9 +1,9 @@
 import { ChangeEvent, useState } from "react";
-import { Board } from "./features/board"
 import SoSBoard from "./components/SoSBoard";
 import ThreeColumnLayout from "./components/ThreeColumnLayout";
+import { SoSGame, gameModes } from "./features/sosGame";
 
-const sosBoard = new Board()
+const sosGame = new SoSGame
 
 const BOARD_SIZES = [
   [3,3],
@@ -15,15 +15,21 @@ const BOARD_SIZES = [
 ]
 
 function App() {
-  const [displayedSize, setDisplayedSize] = useState(sosBoard.size)
+  // const [displayedSize, setDisplayedSize] = useState(sosBoard.size)
+  const [displayedSize, setDisplayedSize] = useState(sosGame.board.size)
   
   const selectBoardSize = (e: ChangeEvent<HTMLSelectElement>) => {
     const boardSize = Number(e.target.value)
     console.log(boardSize)
-    sosBoard.setBoardSize(boardSize, boardSize)
+    sosGame.board.setBoardSize(boardSize, boardSize)
     setDisplayedSize([boardSize, boardSize])
   }
   
+  const selectGameMode = (e: ChangeEvent<HTMLInputElement>) => {
+    const setGameMode = e.target.value
+    console.log(setGameMode)
+  }
+
   return (
     <main>
       <ThreeColumnLayout layoutLevel="root" gap="16px">
@@ -38,8 +44,8 @@ function App() {
         <ThreeColumnLayout.MiddleColumn columnPercent={50}>
           <div className="flex gap-6">
             <form className="flex gap-3">
-              <label><input type='radio' name="game-mode"></input>Simple Game</label>
-              <label><input type='radio' name="game-mode"></input>General Game</label>
+              <label><input type='radio' name="game-mode" onChange={selectGameMode} defaultChecked={true} value={gameModes.Simple}></input>Simple Game</label>
+              <label><input type='radio' name="game-mode" onChange={selectGameMode} value={gameModes.General}></input>General Game</label>
             </form>
 
             <label htmlFor="board-sizes">Board Size:</label>
@@ -57,7 +63,7 @@ function App() {
 
           <div>
             <span className="hidden">{displayedSize}</span>
-            <SoSBoard sosBoard={sosBoard}/>
+            <SoSBoard sosBoard={sosGame.board}/>
           </div>
 
         </ThreeColumnLayout.MiddleColumn>
