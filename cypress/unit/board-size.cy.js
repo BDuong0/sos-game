@@ -6,6 +6,14 @@ describe("AC 1.1: Default Board Size Selection", () => {
     
     expect(board.size.toString()).to.equal([3,3].toString());
   });
+});
+
+describe("AC 1.2: Valid board size selection", () => {
+  it("should initialize default board size to 3x3", () => {
+    const board = new Board()
+    
+    expect(board.size.toString()).to.equal([3,3].toString());
+  });
 
   it("should set board size to 3x3 (minimum board size)", () => {
     const board = new Board(3, 3)
