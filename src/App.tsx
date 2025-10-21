@@ -71,6 +71,8 @@ function App() {
             <SoSBoard sosBoard={sosGame.board}/>
           </div>
 
+          <p>Current Turn: {sosGame.getWhoseTurn() == 1 ? <p>Blue Player</p> : <p>Red Player</p>}</p>
+
         </ThreeColumnLayout.MiddleColumn>
 
         <ThreeColumnLayout.RightColumn columnPercent={25}>
