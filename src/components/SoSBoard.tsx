@@ -1,13 +1,13 @@
 import { Dispatch, useState } from "react";
 import { SoSGame } from "@/features/sosGame";
 
-const SoSBoard = ({
-  sosGame,
-  setDisplayedPlayersTurn,
-}: {
-  sosGame: SoSGame;
+type SoSBoardProps = {
+  sosGame: SoSGame; 
   setDisplayedPlayersTurn: Dispatch<React.SetStateAction<number>>;
-}) => {
+}
+
+const SoSBoard = ({sosGame, setDisplayedPlayersTurn,}: SoSBoardProps) => {
+  
   function showGridCells() {
     return sosGame.board.grid.map((rows, rowIndex) => (
       <li key={rowIndex}>
