@@ -5,6 +5,11 @@ export enum gameModes {
   General = "GENERAL",
 }
 
+export enum gamePlayers {
+    Red = "RED",
+    Blue = "BLUE"
+}
+
 export class SoSGame {
     public board: Board
     private gameMode: gameModes 
