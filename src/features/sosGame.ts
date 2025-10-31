@@ -10,11 +10,6 @@ export enum gamePlayers {
     Blue = "BLUE"
 }
 
-export enum cellValue {
-    S = "S",
-    O = "O"
-}
-
 export class SoSGame {
     public board: Board
     private gameMode: gameModes 
