@@ -1,12 +1,12 @@
-import { Dispatch, useState } from "react";
-import { SoSGame } from "@/features/sosGame";
+import { useState } from "react";
+import { SoSGame, gamePlayers } from "@/features/sosGame";
 
 type SoSBoardProps = {
   sosGame: SoSGame; 
-  setDisplayedPlayersTurn: Dispatch<React.SetStateAction<number>>;
+  switchDisplayedPlayersTurn: (nextPlayerTurn: gamePlayers) => void;
 }
 
-const SoSBoard = ({sosGame, setDisplayedPlayersTurn,}: SoSBoardProps) => {
+const SoSBoard = ({sosGame, switchDisplayedPlayersTurn,}: SoSBoardProps) => {
   
   function showGridCells() {
     return sosGame.board.grid.map((rows, rowIndex) => (
@@ -17,7 +17,7 @@ const SoSBoard = ({sosGame, setDisplayedPlayersTurn,}: SoSBoardProps) => {
               sosGame={sosGame}
               rowIndex={rowIndex}
               colIndex={colIndex}
-              setDisplayedPlayersTurn={setDisplayedPlayersTurn}
+              switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
               key={`[${rowIndex},${colIndex}]`}
             />
           ))}
@@ -44,26 +44,26 @@ type BoardCellProps = {
   sosGame: SoSGame;
   rowIndex: number;
   colIndex: number;
-  setDisplayedPlayersTurn: Dispatch<React.SetStateAction<number>>;
+  switchDisplayedPlayersTurn: (nextPlayerTurn: gamePlayers) => void;
 };
 
 const BoardCell = ({
   sosGame,
   rowIndex,
   colIndex,
-  setDisplayedPlayersTurn,
+  switchDisplayedPlayersTurn,
 }: BoardCellProps) => {
-  const [cellValue, setCellValue] = useState(
+  const [displayedCellValue, setDisplayedCellValue] = useState(
     sosGame.board.grid[rowIndex][colIndex],
   );
 
   const displayPlayerSymbol = () => {
-    if (cellValue == 1) {
+    if (displayedCellValue == 1) {
       return <span>S</span>;
-    } else if (cellValue == 2) {
+    } else if (displayedCellValue == 2) {
       return <span>O</span>;
-    } else if (cellValue == 0) {
-      return <span>''</span>;
+    } else if (displayedCellValue == 0) {
+      return <span className="opacity-0">''</span>;
     }
   };
 
@@ -77,33 +77,31 @@ const BoardCell = ({
     }
   };
 
-  const handleOnClick = () => {
+  const placeSymbolInCell = () => {
     console.log(`Cell index = [${rowIndex}][${colIndex}]`);
 
     if (isCellOccupied() == true) return;
 
     const whoseTurn = sosGame.getWhoseTurn();
 
-    if (whoseTurn == 1) {
-      // Blue player turn to place an O
+    if (whoseTurn == gamePlayers.Blue) {
       sosGame.board.editCellValue(rowIndex, colIndex, 1);
-      setCellValue(1);
+      setDisplayedCellValue(1);
 
-      sosGame.setWhoseTurn(2);
-      setDisplayedPlayersTurn(2);
-    } else if (whoseTurn == 2) {
-      // Blue player turn to place an O
+      sosGame.setWhoseTurn(gamePlayers.Red);
+      switchDisplayedPlayersTurn(gamePlayers.Red)
+    } else if (whoseTurn == gamePlayers.Red) {
       sosGame.board.editCellValue(rowIndex, colIndex, 2);
-      setCellValue(2);
+      setDisplayedCellValue(2);
 
-      sosGame.setWhoseTurn(1);
-      setDisplayedPlayersTurn(1);
+      sosGame.setWhoseTurn(gamePlayers.Blue);
+      switchDisplayedPlayersTurn(gamePlayers.Blue)
     }
   };
 
   return (
     <li key={colIndex} className="border-2 border-solid border-black">
-      <button className="h-full w-full cursor-pointer" onClick={handleOnClick}>
+      <button className="h-full w-full cursor-pointer" onClick={placeSymbolInCell}>
         {displayPlayerSymbol()}
       </button>
     </li>
