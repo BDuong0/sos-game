@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import SoSBoard from "./components/SoSBoard";
 import ThreeColumnLayout from "./components/ThreeColumnLayout";
-import { SoSGame, gameModes } from "./features/sosGame";
+import { SoSGame, gameModes, gamePlayers } from "./features/sosGame";
 
 const sosGame = new SoSGame
 
@@ -15,10 +15,13 @@ const BOARD_SIZES = [
 ]
 
 function App() {
-  // const [displayedSize, setDisplayedSize] = useState(sosBoard.size)
   const [displayedSize, setDisplayedSize] = useState(sosGame.board.size)
   const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurn())
   
+  const switchDisplayedPlayersTurn = (nextPlayerTurn: gamePlayers) => {
+    setDisplayedPlayersTurn(nextPlayerTurn)
+  }
+
   const selectBoardSize = (e: ChangeEvent<HTMLSelectElement>) => {
     const boardSize = Number(e.target.value)
     console.log(boardSize)
@@ -69,7 +72,7 @@ function App() {
 
           <div>
             <span className="hidden">{displayedSize}</span>
-            <SoSBoard sosGame={sosGame} setDisplayedPlayersTurn={setDisplayedPlayersTurn}/>
+            <SoSBoard sosGame={sosGame} switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}/>
           </div>
 
           <p>Current Turn: {displayedPlayersTurn == 1 ? <span>Blue Player</span> : <span>Red Player</span>}</p>
