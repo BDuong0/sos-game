@@ -75,7 +75,7 @@ function App() {
             <SoSBoard sosGame={sosGame} switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}/>
           </div>
 
-          <p>Current Turn: {displayedPlayersTurn == 1 ? <span>Blue Player</span> : <span>Red Player</span>}</p>
+          <p>Current Turn: {displayedPlayersTurn == gamePlayers.Blue ? <span>Blue Player</span> : <span>Red Player</span>}</p>
 
         </ThreeColumnLayout.MiddleColumn>
 
