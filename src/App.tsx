@@ -17,9 +17,15 @@ const BOARD_SIZES = [
 function App() {
   const [displayedSize, setDisplayedSize] = useState(sosGame.board.size)
   const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurn())
+  const [isSymbolSelected, setIsSymbolSelected] = useState(true)
   
   const switchDisplayedPlayersTurn = (nextPlayerTurn: gamePlayers) => {
     setDisplayedPlayersTurn(nextPlayerTurn)
+  }
+  const selectPlayerSymbols = () => {
+    // Blue player chooses 'S/O', Red player automatically chooses opposite symbol and vice versa 
+    // Red player chooses 'S/O', Blue player automatically chooses opposite symbol and vice versa
+    setIsSymbolSelected(prevValue => !prevValue)
   }
 
   const selectBoardSize = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -45,8 +51,8 @@ function App() {
         <ThreeColumnLayout.LeftColumn columnPercent={25}>
           <p>Blue Player</p>
           
-          <label><input type='radio' name="blue-player-symbol" value="S" defaultChecked={true}></input>S</label>
-          <label><input type='radio' name="blue-player-symbol" value="O"></input>O</label>
+          <label><input type='radio' name="blue-player-symbol" onChange={selectPlayerSymbols} value="S" checked={isSymbolSelected}></input>S</label>
+          <label><input type='radio' name="blue-player-symbol" onChange={selectPlayerSymbols} value="O" checked={!isSymbolSelected}></input>O</label>
           
         </ThreeColumnLayout.LeftColumn>
 
@@ -82,8 +88,8 @@ function App() {
         <ThreeColumnLayout.RightColumn columnPercent={25}>
           <p>Red Player Column</p>
 
-          <label><input type='radio' name="red-player-symbol" value="S"></input>S</label>
-          <label><input type='radio' name="red-player-symbol" value="O" defaultChecked={true}></input>O</label>
+          <label><input type='radio' name="red-player-symbol" onChange={selectPlayerSymbols} value="S" checked={!isSymbolSelected}></input>S</label>
+          <label><input type='radio' name="red-player-symbol" onChange={selectPlayerSymbols} value="O" checked={isSymbolSelected}></input>O</label>
         </ThreeColumnLayout.RightColumn>
       </ThreeColumnLayout>
     </main>
