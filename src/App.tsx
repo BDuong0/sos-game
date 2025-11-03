@@ -1,7 +1,8 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import SoSBoard from "./components/SoSBoard";
 import ThreeColumnLayout from "./components/ThreeColumnLayout";
 import { SoSGame, gameModes, gamePlayers } from "./features/sosGame";
+import { BluePlayer, RedPlayer } from "./features/player";
 
 const sosGame = new SoSGame
 
@@ -14,10 +15,23 @@ const BOARD_SIZES = [
   [8,8]
 ]
 
+const bluePlayer = new BluePlayer("S")
+const redPlayer = new RedPlayer("O")
+
 function App() {
   const [displayedSize, setDisplayedSize] = useState(sosGame.board.size)
   const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurn())
   const [isSymbolSelected, setIsSymbolSelected] = useState(true)
+
+  const bluePlayerSymbolInput = {
+    ref: useRef<HTMLFormElement>(null),
+    inputName: "blue-player-symbol"
+  }
+
+  const redPlayerSymbolInput = {
+    ref: useRef<HTMLFormElement>(null),
+    inputName: "red-player-symbol"
+  }
   
   const switchDisplayedPlayersTurn = (nextPlayerTurn: gamePlayers) => {
     setDisplayedPlayersTurn(nextPlayerTurn)
@@ -26,6 +40,18 @@ function App() {
     // Blue player chooses 'S/O', Red player automatically chooses opposite symbol and vice versa 
     // Red player chooses 'S/O', Blue player automatically chooses opposite symbol and vice versa
     setIsSymbolSelected(prevValue => !prevValue)
+
+    setTimeout(() => {
+      if (bluePlayerSymbolInput.ref.current) {
+      const selectedBluePlayerSymbol = (bluePlayerSymbolInput.ref.current.querySelector(`input[name="${bluePlayerSymbolInput.inputName}"]:checked`)) as HTMLInputElement
+      bluePlayer.setPlayerSymbol(selectedBluePlayerSymbol.value)
+    }
+
+    if (redPlayerSymbolInput.ref.current) {
+      const selectedRedPlayerSymbol = (redPlayerSymbolInput.ref.current.querySelector(`input[name="${redPlayerSymbolInput.inputName}"]:checked`)) as HTMLInputElement
+      redPlayer.setPlayerSymbol(selectedRedPlayerSymbol.value)
+    }
+    }, 100)
   }
 
   const selectBoardSize = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -51,8 +77,10 @@ function App() {
         <ThreeColumnLayout.LeftColumn columnPercent={25}>
           <p>Blue Player</p>
           
-          <label><input type='radio' name="blue-player-symbol" onChange={selectPlayerSymbols} value="S" checked={isSymbolSelected}></input>S</label>
-          <label><input type='radio' name="blue-player-symbol" onChange={selectPlayerSymbols} value="O" checked={!isSymbolSelected}></input>O</label>
+          <form ref={bluePlayerSymbolInput.ref}>
+            <label><input type='radio' name={bluePlayerSymbolInput.inputName} onChange={selectPlayerSymbols} value="S" checked={isSymbolSelected}></input>S</label>
+            <label><input type='radio' name={bluePlayerSymbolInput.inputName} onChange={selectPlayerSymbols} value="O" checked={!isSymbolSelected}></input>O</label>
+          </form>
           
         </ThreeColumnLayout.LeftColumn>
 
@@ -88,8 +116,10 @@ function App() {
         <ThreeColumnLayout.RightColumn columnPercent={25}>
           <p>Red Player Column</p>
 
-          <label><input type='radio' name="red-player-symbol" onChange={selectPlayerSymbols} value="S" checked={!isSymbolSelected}></input>S</label>
-          <label><input type='radio' name="red-player-symbol" onChange={selectPlayerSymbols} value="O" checked={isSymbolSelected}></input>O</label>
+          <form ref={redPlayerSymbolInput.ref}>
+            <label><input type='radio' name={redPlayerSymbolInput.inputName} onChange={selectPlayerSymbols} value="S" checked={!isSymbolSelected}></input>S</label>
+            <label><input type='radio' name={redPlayerSymbolInput.inputName} onChange={selectPlayerSymbols} value="O" checked={isSymbolSelected}></input>O</label>
+          </form>
         </ThreeColumnLayout.RightColumn>
       </ThreeColumnLayout>
     </main>
