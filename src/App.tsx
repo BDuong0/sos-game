@@ -1,10 +1,8 @@
 import { ChangeEvent, useRef, useState } from "react";
 import SoSBoard from "./components/SoSBoard";
 import ThreeColumnLayout from "./components/ThreeColumnLayout";
-import { SoSGame, gameModes, gamePlayers } from "./features/sosGame";
-import { BluePlayer, RedPlayer } from "./features/player";
-
-const sosGame = new SoSGame
+import { GeneralSoSGame, SimpleSoSGame } from "./features/sosGame";
+import { Player } from "./features/player";
 
 const BOARD_SIZES = [
   [3,3],
@@ -15,8 +13,10 @@ const BOARD_SIZES = [
   [8,8]
 ]
 
-const bluePlayer = new BluePlayer("S")
-const redPlayer = new RedPlayer("O")
+const bluePlayer = new Player("Blue Player","S")
+const redPlayer = new Player("Red Player" ,"O")
+
+let sosGame = new SimpleSoSGame([bluePlayer, redPlayer], bluePlayer)
 
 function App() {
   const [displayedSize, setDisplayedSize] = useState(sosGame.board.size)
@@ -56,7 +56,6 @@ function App() {
 
   const selectBoardSize = (e: ChangeEvent<HTMLSelectElement>) => {
     const boardSize = Number(e.target.value)
-    console.log(boardSize)
     sosGame.board.setBoardSize(boardSize, boardSize)
     setDisplayedSize([boardSize, boardSize])
   }
@@ -64,10 +63,11 @@ function App() {
   const selectGameMode = (e: ChangeEvent<HTMLInputElement>) => {
     const setGameMode = e.target.value
 
+    console.log(setGameMode)
     if (setGameMode == "SIMPLE") {
-      sosGame.setGameMode(gameModes.Simple)
-    } else {
-      sosGame.setGameMode(gameModes.General)
+      sosGame = new SimpleSoSGame([bluePlayer, redPlayer], bluePlayer) 
+    } else if (setGameMode == "GENERAL") {
+      sosGame = new GeneralSoSGame([bluePlayer, redPlayer], bluePlayer) 
     }
   }
 
@@ -87,8 +87,8 @@ function App() {
         <ThreeColumnLayout.MiddleColumn columnPercent={50}>
           <div className="flex gap-6">
             <form className="flex gap-3">
-              <label><input type='radio' name="game-mode" onChange={selectGameMode} defaultChecked={true} value={gameModes.Simple}></input>Simple Game</label>
-              <label><input type='radio' name="game-mode" onChange={selectGameMode} value={gameModes.General}></input>General Game</label>
+              <label><input type='radio' name="game-mode" onChange={selectGameMode} defaultChecked={true} value="SIMPLE"></input>Simple Game</label>
+              <label><input type='radio' name="game-mode" onChange={selectGameMode} value="GENERAL"></input>General Game</label>
             </form>
 
             <label htmlFor="board-sizes">Board Size:</label>
