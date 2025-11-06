@@ -1,8 +1,10 @@
-import { Board } from "./board";
+import { Board, CellValuesType } from "./board";
+import { Player } from "./player";
 
-export enum gameModes {
-  Simple = "SIMPLE",
-  General = "GENERAL",
+const allowedCellValues: CellValuesType<string> = {
+    empty: "",
+    S: "S",
+    O: "O"
 }
 
 export abstract class SoSGame {
@@ -24,8 +26,26 @@ export abstract class SoSGame {
         return this.whoseTurnIsIt
     }
 
-    public setGameMode(gameMode: gameModes) {
-        this.gameMode = gameMode
+    public setWhoseTurnIsIt(player: Player) {
+        this.whoseTurnIsIt = player
+    }   
+
+    private isCellOccupied (rowIndex: number, columnIndex: number) {
+        const currentCellValue = this.board.getCellValue(rowIndex, columnIndex);
+
+        if (currentCellValue != this.board.cellValues.empty) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    public placeSymbolInEmptyCell(rowIndex: number, columnIndex: number) {
+        this.board.editCellValue(rowIndex, columnIndex, this.whoseTurnIsIt.getPlayerSymbol())
+
+        if (this.isCellOccupied(rowIndex, columnIndex) == true) return;
+
+        this.board.editCellValue(rowIndex, columnIndex, this.getWhoseTurnIsIt().getPlayerSymbol())
     }
 
     public getWhoseTurn() {
