@@ -5,24 +5,23 @@ export enum gameModes {
   General = "GENERAL",
 }
 
-export enum gamePlayers {
-    Red = "RED",
-    Blue = "BLUE"
-}
+export abstract class SoSGame {
+    public board: Board<string>
+    private players: Player[]
+    private whoseTurnIsIt: Player
 
-export class SoSGame {
-    public board: Board
-    private gameMode: gameModes 
-    private whoseTurn: gamePlayers
-
-    constructor(gameMode: gameModes = gameModes.Simple) {
-        this.board = new Board()
-        this.gameMode = gameMode
-        this.whoseTurn = gamePlayers.Blue
+    constructor(players: Player[], whoseTurnIsIt: Player) {
+        this.board = new Board(allowedCellValues, 3, 3, true)
+        this.players = players
+        this.whoseTurnIsIt = whoseTurnIsIt
     }
 
-    public getGameMode(){
-        return this.gameMode
+    public getPlayers(): Player[] {
+        return this.players
+    }
+
+    public getWhoseTurnIsIt(): Player {
+        return this.whoseTurnIsIt
     }
 
     public setGameMode(gameMode: gameModes) {
