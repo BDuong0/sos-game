@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { SoSGame, gamePlayers } from "@/features/sosGame";
+import { SoSGame } from "@/features/sosGame";
+import { Player } from "@/features/player";
 
 type SoSBoardProps = {
   sosGame: SoSGame; 
-  switchDisplayedPlayersTurn: (nextPlayerTurn: gamePlayers) => void;
+  switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void;
 }
 
 const SoSBoard = ({sosGame, switchDisplayedPlayersTurn,}: SoSBoardProps) => {
@@ -44,7 +45,7 @@ type BoardCellProps = {
   sosGame: SoSGame;
   rowIndex: number;
   colIndex: number;
-  switchDisplayedPlayersTurn: (nextPlayerTurn: gamePlayers) => void;
+  switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void;
 };
 
 const BoardCell = ({
@@ -58,50 +59,41 @@ const BoardCell = ({
   );
 
   const displayPlayerSymbol = () => {
-    if (displayedCellValue == 1) {
+    if (displayedCellValue == sosGame.board.cellValues.S) {
       return <span>S</span>;
-    } else if (displayedCellValue == 2) {
+    } else if (displayedCellValue == sosGame.board.cellValues.O) {
       return <span>O</span>;
-    } else if (displayedCellValue == 0) {
+    } else if (displayedCellValue == sosGame.board.cellValues.empty) {
       return <span className="opacity-0">''</span>;
     }
   };
 
-  const isCellOccupied = () => {
-    const currentCellValue = sosGame.board.getCellValue(rowIndex, colIndex);
-
-    if (currentCellValue == 1 || currentCellValue == 2) {
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  const placeSymbolInCell = () => {
+  const placeSymbolInCell = (nextPlayersTurn: Player) => {
     console.log(`Cell index = [${rowIndex}][${colIndex}]`);
 
-    if (isCellOccupied() == true) return;
+    const currentPlayersTurn = sosGame.getWhoseTurnIsIt();
 
-    const whoseTurn = sosGame.getWhoseTurn();
+    sosGame.makeMove()
+    setDisplayedCellValue(currentPlayersTurn.getPlayerSymbol())
 
-    if (whoseTurn == gamePlayers.Blue) {
-      sosGame.board.editCellValue(rowIndex, colIndex, 1);
-      setDisplayedCellValue(1);
-
-      sosGame.setWhoseTurn(gamePlayers.Red);
-      switchDisplayedPlayersTurn(gamePlayers.Red)
-    } else if (whoseTurn == gamePlayers.Red) {
-      sosGame.board.editCellValue(rowIndex, colIndex, 2);
-      setDisplayedCellValue(2);
-
-      sosGame.setWhoseTurn(gamePlayers.Blue);
-      switchDisplayedPlayersTurn(gamePlayers.Blue)
-    }
+    sosGame.setWhoseTurnIsIt(nextPlayersTurn)
+    switchDisplayedPlayersTurn(nextPlayersTurn)
   };
+
+  const decideNextPlayersTurn = () => {
+    const currentPlayersTurn = sosGame.getWhoseTurnIsIt();
+    const [bluePlayer, redPlayer] = sosGame.getPlayers()
+
+    if (currentPlayersTurn == redPlayer) {
+      return bluePlayer
+    } else {
+      return redPlayer
+    }
+  }
 
   return (
     <li key={colIndex} className="border-2 border-solid border-black">
-      <button className="h-full w-full cursor-pointer" onClick={placeSymbolInCell}>
+      <button className="h-full w-full cursor-pointer" onClick={() => {placeSymbolInCell(decideNextPlayersTurn())}}>
         {displayPlayerSymbol()}
       </button>
     </li>
