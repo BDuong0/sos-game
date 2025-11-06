@@ -20,7 +20,7 @@ let sosGame = new SimpleSoSGame([bluePlayer, redPlayer], bluePlayer)
 
 function App() {
   const [displayedSize, setDisplayedSize] = useState(sosGame.board.size)
-  const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurn())
+  const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurnIsIt().getPlayerSymbol())
   const [isSymbolSelected, setIsSymbolSelected] = useState(true)
 
   const bluePlayerSymbolInput = {
@@ -33,8 +33,8 @@ function App() {
     inputName: "red-player-symbol"
   }
   
-  const switchDisplayedPlayersTurn = (nextPlayerTurn: gamePlayers) => {
-    setDisplayedPlayersTurn(nextPlayerTurn)
+  const switchDisplayedPlayersTurn = (nextPlayerTurn: Player) => {
+    setDisplayedPlayersTurn(nextPlayerTurn.getPlayerName())
   }
   const selectPlayerSymbols = () => {
     // Blue player chooses 'S/O', Red player automatically chooses opposite symbol and vice versa 
@@ -109,7 +109,7 @@ function App() {
             <SoSBoard sosGame={sosGame} switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}/>
           </div>
 
-          <p>Current Turn: {displayedPlayersTurn == gamePlayers.Blue ? <span>Blue Player</span> : <span>Red Player</span>}</p>
+          <p>Current Turn: {displayedPlayersTurn}</p>
 
         </ThreeColumnLayout.MiddleColumn>
 
