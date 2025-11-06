@@ -48,11 +48,25 @@ export abstract class SoSGame {
         this.board.editCellValue(rowIndex, columnIndex, this.getWhoseTurnIsIt().getPlayerSymbol())
     }
 
-    public getWhoseTurn() {
-        return this.whoseTurn
+    abstract makeMove(): void
+}
+
+export class SimpleSoSGame extends SoSGame {
+    constructor(players: Player[], whoseTurnIsIt: Player){
+        super(players, whoseTurnIsIt)
     }
 
-    public setWhoseTurn(player: gamePlayers) {
-        this.whoseTurn = player
+    public makeMove() {
+        console.log("Implement makeMove() for SimpleSoSGame")
+    }
+}
+
+export class GeneralSoSGame extends SoSGame {
+    constructor(players: Player[], whoseTurnIsIt: Player){
+        super(players, whoseTurnIsIt)
+    }
+
+    public makeMove() {
+        console.log("Implement makeMove() for GeneralSoSGame")
     }
 }
