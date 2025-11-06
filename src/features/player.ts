@@ -1,8 +1,18 @@
-abstract class Player {
+export class Player {
+    private playerName: string
     private playerSymbol: string
 
-    constructor(playerSymbol: string){
+    constructor(playerName: string, playerSymbol: string){
+        this.playerName = playerName
         this.playerSymbol = playerSymbol
+    }
+    
+    public getPlayerName() {
+        return this.playerName
+    }
+
+    public setPlayerName(newPlayerName: string) {
+        this.playerSymbol = newPlayerName
     }
 
     public getPlayerSymbol() {
@@ -11,17 +21,5 @@ abstract class Player {
 
     public setPlayerSymbol(newPlayerSymbol: string) {
         this.playerSymbol = newPlayerSymbol
-    }
-}
-
-export class RedPlayer extends Player {
-    constructor(playerSymbol: string) { 
-        super(playerSymbol);
-    }
-}
-
-export class BluePlayer extends Player {
-    constructor(playerSymbol: string) { 
-        super(playerSymbol);
     }
 }
