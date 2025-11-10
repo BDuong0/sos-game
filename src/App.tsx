@@ -20,7 +20,7 @@ let sosGame = new SimpleSoSGame([bluePlayer, redPlayer], bluePlayer)
 
 function App() {
   const [displayedSize, setDisplayedSize] = useState(sosGame.board.size)
-  const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurnIsIt().getPlayerSymbol())
+  const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurnIsIt().getPlayerName())
   const [isSymbolSelected, setIsSymbolSelected] = useState(true)
 
   const bluePlayerSymbolInput = {
