@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, RefObject, useRef, useState } from "react";
 import SoSBoard from "./components/SoSBoard";
 import ThreeColumnLayout from "./components/ThreeColumnLayout";
 import { GeneralSoSGame, SimpleSoSGame } from "./features/sosGame";
@@ -21,7 +21,6 @@ let sosGame = new SimpleSoSGame([bluePlayer, redPlayer], bluePlayer)
 function App() {
   const [displayedSize, setDisplayedSize] = useState(sosGame.board.size)
   const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurnIsIt().getPlayerName())
-  const [isSymbolSelected, setIsSymbolSelected] = useState(true)
 
   const bluePlayerSymbolInput = {
     ref: useRef<HTMLFormElement>(null),
@@ -36,22 +35,15 @@ function App() {
   const switchDisplayedPlayersTurn = (nextPlayerTurn: Player) => {
     setDisplayedPlayersTurn(nextPlayerTurn.getPlayerName())
   }
-  const selectPlayerSymbols = () => {
-    // Blue player chooses 'S/O', Red player automatically chooses opposite symbol and vice versa 
-    // Red player chooses 'S/O', Blue player automatically chooses opposite symbol and vice versa
-    setIsSymbolSelected(prevValue => !prevValue)
 
-    setTimeout(() => {
-      if (bluePlayerSymbolInput.ref.current) {
-      const selectedBluePlayerSymbol = (bluePlayerSymbolInput.ref.current.querySelector(`input[name="${bluePlayerSymbolInput.inputName}"]:checked`)) as HTMLInputElement
-      bluePlayer.setPlayerSymbol(selectedBluePlayerSymbol.value)
-    }
+  const selectPlayerSymbol = (playerSymbolInput : {ref: RefObject<HTMLFormElement | null>, inputName: string}, player: Player) => {
+    
+    if (playerSymbolInput.ref.current) {
+      const selectedPlayerSymbol = (playerSymbolInput.ref.current.querySelector(`input[name="${playerSymbolInput.inputName}"]:checked`)) as HTMLInputElement
+      player.setPlayerSymbol(selectedPlayerSymbol.value)
+    }    
 
-    if (redPlayerSymbolInput.ref.current) {
-      const selectedRedPlayerSymbol = (redPlayerSymbolInput.ref.current.querySelector(`input[name="${redPlayerSymbolInput.inputName}"]:checked`)) as HTMLInputElement
-      redPlayer.setPlayerSymbol(selectedRedPlayerSymbol.value)
-    }
-    }, 100)
+    console.log(`${player.getPlayerName()} Symbol =  ${player.getPlayerSymbol()}`)
   }
 
   const selectBoardSize = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -78,8 +70,8 @@ function App() {
           <p>Blue Player</p>
           
           <form ref={bluePlayerSymbolInput.ref}>
-            <label><input type='radio' name={bluePlayerSymbolInput.inputName} onChange={selectPlayerSymbols} value="S" checked={isSymbolSelected}></input>S</label>
-            <label><input type='radio' name={bluePlayerSymbolInput.inputName} onChange={selectPlayerSymbols} value="O" checked={!isSymbolSelected}></input>O</label>
+            <label><input type='radio' name={bluePlayerSymbolInput.inputName} onChange={() => {selectPlayerSymbol(bluePlayerSymbolInput, bluePlayer)}} value="S" defaultChecked={true}></input>S</label>
+            <label><input type='radio' name={bluePlayerSymbolInput.inputName} onChange={() => {selectPlayerSymbol(bluePlayerSymbolInput, bluePlayer)}} value="O"></input>O</label>
           </form>
           
         </ThreeColumnLayout.LeftColumn>
@@ -117,8 +109,8 @@ function App() {
           <p>Red Player Column</p>
 
           <form ref={redPlayerSymbolInput.ref}>
-            <label><input type='radio' name={redPlayerSymbolInput.inputName} onChange={selectPlayerSymbols} value="S" checked={!isSymbolSelected}></input>S</label>
-            <label><input type='radio' name={redPlayerSymbolInput.inputName} onChange={selectPlayerSymbols} value="O" checked={isSymbolSelected}></input>O</label>
+            <label><input type='radio' name={redPlayerSymbolInput.inputName} onChange={() => {selectPlayerSymbol(redPlayerSymbolInput, redPlayer)}} value="S"></input>S</label>
+            <label><input type='radio' name={redPlayerSymbolInput.inputName} onChange={() => {selectPlayerSymbol(redPlayerSymbolInput, redPlayer)}} value="O" defaultChecked={true}></input>O</label>
           </form>
         </ThreeColumnLayout.RightColumn>
       </ThreeColumnLayout>
