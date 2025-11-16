@@ -40,10 +40,14 @@ export abstract class SoSGame {
     }
   }
 
-  public placeSymbolInEmptyCell(rowIndex: number, columnIndex: number) {
+  public makeMove(currentPlayerTurn: Player, rowIndex: number, columnIndex: number) {
+    this.placeSymbolInEmptyCell(currentPlayerTurn, rowIndex, columnIndex);
+  };
+
+  public placeSymbolInEmptyCell(currentPlayerTurn: Player, rowIndex: number, columnIndex: number) {
     if (this.isCellOccupied(rowIndex, columnIndex) == true) return;
 
-    const cellOwnedBy = this.whoseTurnIsIt;
+    const cellOwnedBy = currentPlayerTurn;
 
     this.board.editCellValue(rowIndex, columnIndex, [cellOwnedBy.getPlayerSymbol(), cellOwnedBy]);
   }

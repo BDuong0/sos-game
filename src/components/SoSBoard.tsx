@@ -69,10 +69,9 @@ const BoardCell = ({
   };
 
   const placeSymbolInCell = (rowIndex: number, columnIndex: number, nextPlayersTurn: Player) => {
-    const currentPlayersTurn = sosGame.getWhoseTurnIsIt();
-    sosGame.placeSymbolInEmptyCell(rowIndex, columnIndex);
+    sosGame.makeMove(sosGame.getWhoseTurnIsIt(), rowIndex, columnIndex)
 
-    setDisplayedCellValue(currentPlayersTurn.getPlayerSymbol());
+    setDisplayedCellValue(sosGame.getWhoseTurnIsIt().getPlayerSymbol());
 
     sosGame.setWhoseTurnIsIt(nextPlayersTurn);
     switchDisplayedPlayersTurn(nextPlayersTurn);
