@@ -106,22 +106,34 @@ export abstract class SoSGame {
 }
 
 export class SimpleSoSGame extends SoSGame {
-  constructor(players: Player[], whoseTurnIsIt: Player) {
-    super(players, whoseTurnIsIt);
+  constructor(players: Player[], totalRows: number = 3, totalColumns: number = 3,  whoseTurnIsIt: Player) {
+    super(players, totalRows, totalColumns, whoseTurnIsIt);
   }
 
-  public makeMove(rowIndex: number, columnIndex: number) {
-    console.log("Implement makeMove() for SimpleSoSGame");
-    this.placeSymbolInEmptyCell(rowIndex, columnIndex);
+  public determineWinner() {
+    console.log("Implement determineWinner() for SimpleSoSGame");
+
+    for (let i = 0; i < this.getPlayers().length; i++) {
+      if (this.getPlayers()[i].sosCount == 1) {
+        return this.getPlayers()[i]
+      }
+    }
+    
   }
 }
 
 export class GeneralSoSGame extends SoSGame {
-  constructor(players: Player[], whoseTurnIsIt: Player) {
-    super(players, whoseTurnIsIt);
+  constructor(players: Player[], totalRows: number = 3, totalColumns: number = 3,  whoseTurnIsIt: Player) {
+    super(players, totalRows, totalColumns, whoseTurnIsIt);
   }
 
-  public makeMove() {
-    console.log("Implement makeMove() for GeneralSoSGame");
+  public determineWinner() {
+    console.log("Implement determineWinner() for GeneralSoSGame");
+
+    for (let i = 0; i < this.getPlayers().length; i++) {
+      if (this.getPlayers()[i].sosCount == 1) {
+        return this.getPlayers()[i]
+      }
+    }
   }
 }
