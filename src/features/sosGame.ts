@@ -10,6 +10,8 @@ const allowedCellValues: CellValuesType<string> = {
 
 export abstract class SoSGame {
   public board: Board<string>;
+  public turnCount: number = 1
+  public totalCells: number
   private players: Player[];
   private totalRows: number = 3;
   private totalColumns: number = 3;
@@ -18,6 +20,8 @@ export abstract class SoSGame {
   constructor(players: Player[], totalRows: number, totalColumns: number,whoseTurnIsIt: Player) {
     this.board = new Board(allowedCellValues, totalRows, totalColumns, true);
     this.players = players;
+    this.turnCount = 0
+    this.totalCells = this.totalRows * this.totalColumns
     this.whoseTurnIsIt = whoseTurnIsIt;
   }
 
@@ -129,11 +133,23 @@ export class GeneralSoSGame extends SoSGame {
 
   public determineWinner() {
     console.log("Implement determineWinner() for GeneralSoSGame");
+    console.log(`this.totalCells = ${this.totalCells}`)
 
-    for (let i = 0; i < this.getPlayers().length; i++) {
-      if (this.getPlayers()[i].sosCount == 1) {
-        return this.getPlayers()[i]
+    if (this.turnCount == this.totalCells) { // All cells have been filled up
+      const playerSoSCounts = this.getPlayers().map(player => player.sosCount)
+      
+      if(Math.max(...playerSoSCounts) > 0) {
+        for (let i = 0; i < this.getPlayers().length; i++) {
+          if (this.getPlayers()[i].sosCount == Math.max(...playerSoSCounts)) {
+            return this.getPlayers()[i]
+          }
+        }
+      } else {
+        return undefined
       }
+    } else {
+      return undefined
     }
+
   }
 }
