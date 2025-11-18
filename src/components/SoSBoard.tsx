@@ -5,25 +5,25 @@ import { Player } from "@/features/player";
 type SoSBoardProps = {
   sosGame: SoSGame;
   switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void;
+  setDisplayedPlayersSoSCount: React.Dispatch<React.SetStateAction<number>>[]
+  setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>
 };
 
-const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn }: SoSBoardProps) => {
+const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn, setDisplayedPlayersSoSCount, setDisplayedWinner}: SoSBoardProps) => {
   function showGridCells() {
-    return sosGame.board.grid.map((rows, rowIndex) => (
-      <li key={rowIndex}>
-        <ul>
-          {rows.map((columns, colIndex) => (
-            <BoardCell
-              sosGame={sosGame}
-              rowIndex={rowIndex}
-              columnIndex={colIndex}
-              switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
-              key={`[${rowIndex},${colIndex}]`}
-            />
-          ))}
-        </ul>
-      </li>
-    ));
+    return sosGame.board.grid.flatMap((rows, rowIndex) =>
+      rows.map((_, columnIndex) => (
+        <BoardCell
+          sosGame={sosGame}
+          rowIndex={rowIndex}
+          columnIndex={columnIndex}
+          switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
+          setDisplayedPlayersSoSCount = {setDisplayedPlayersSoSCount}
+          setDisplayedWinner = {setDisplayedWinner}
+          key={`cell-${rowIndex}-${columnIndex}`}
+        />
+      )),
+    );
   }
 
   return (
@@ -40,18 +40,22 @@ const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn }: SoSBoardProps) => {
 
 export default SoSBoard;
 
-type BoardCellProps = {
+interface BoardCellProps {
   sosGame: SoSGame;
   rowIndex: number;
   columnIndex: number;
   switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void;
-};
+  setDisplayedPlayersSoSCount: React.Dispatch<React.SetStateAction<number>>[]
+  setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>
+}
 
 const BoardCell = ({
   sosGame,
   rowIndex,
   columnIndex,
   switchDisplayedPlayersTurn,
+  setDisplayedPlayersSoSCount,
+  setDisplayedWinner
 }: BoardCellProps) => {
   const [displayedCellValue, setDisplayedCellValue] = useState(
     // sosGame.board.grid[rowIndex][columnIndex] = [string, any]
@@ -68,10 +72,30 @@ const BoardCell = ({
     }
   };
 
-  const placeSymbolInCell = (rowIndex: number, columnIndex: number, nextPlayersTurn: Player) => {
-    sosGame.makeMove(sosGame.getWhoseTurnIsIt(), rowIndex, columnIndex)
-
+  const placeSymbolInCell = (
+    rowIndex: number,
+    columnIndex: number,
+    nextPlayersTurn: Player,
+  ) => {
     setDisplayedCellValue(sosGame.getWhoseTurnIsIt().getPlayerSymbol());
+
+    const filledCellIndex = sosGame.makeMove(
+      sosGame.getWhoseTurnIsIt(),
+      rowIndex,
+      columnIndex,
+    );
+
+    sosGame.detectSOSMade(filledCellIndex[0], filledCellIndex[1]);
+    
+    for (let i = 0; i < setDisplayedPlayersSoSCount.length ; i++) {
+      setDisplayedPlayersSoSCount[i](sosGame.getPlayers()[i].sosCount)
+    }
+
+    const winner = sosGame.determineWinner()
+
+    if (winner) {
+      setDisplayedWinner(winner)
+    }
 
     sosGame.setWhoseTurnIsIt(nextPlayersTurn);
     switchDisplayedPlayersTurn(nextPlayersTurn);
@@ -89,7 +113,7 @@ const BoardCell = ({
   };
 
   return (
-    <li key={columnIndex} className="border-2 border-solid border-black">
+    <div className="border-2 border-solid border-black">
       <button
         className="h-full w-full cursor-pointer"
         onClick={() => {
@@ -98,6 +122,6 @@ const BoardCell = ({
       >
         {displayPlayerSymbol()}
       </button>
-    </li>
+    </div>
   );
 };
