@@ -91,6 +91,8 @@ const BoardCell = ({
       setDisplayedPlayersSoSCount[i](sosGame.getPlayers()[i].sosCount)
     }
 
+    sosGame.turnCount += 1
+
     const winner = sosGame.determineWinner()
 
     if (winner) {
