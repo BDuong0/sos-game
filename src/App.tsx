@@ -24,6 +24,7 @@ function App() {
   const [redPlayerSoSCount, setRedPlayerSoSCount] = useState(redPlayer.sosCount,);
   const [bluePlayerSoSCount, setBluePlayerSoSCount] = useState(redPlayer.sosCount,);
   const [displayWinner, setDisplayedWinner] = useState<undefined | Player>(undefined);
+  const [renderGameMode, setRenderedGameMode] = useState<string>("SIMPLE")
 
   const bluePlayerSymbolInput = {
     ref: useRef<HTMLFormElement>(null),
@@ -93,6 +94,7 @@ function App() {
         displayedSize[1],
         bluePlayer,
       );
+      setRenderedGameMode("SIMPLE")
     } else if (setGameMode == "GENERAL") {
       sosGame = new GeneralSoSGame(
         [bluePlayer, redPlayer],
@@ -100,6 +102,7 @@ function App() {
         displayedSize[1],
         bluePlayer,
       );
+      setRenderedGameMode("GENERAL")
     }
   };
 
@@ -177,6 +180,7 @@ function App() {
 
           <div>
             <span className="hidden">{displayedSize}</span>
+            <span>{renderGameMode}</span>
             <SoSBoard
               sosGame={sosGame}
               switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
