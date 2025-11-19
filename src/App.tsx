@@ -2,7 +2,7 @@ import { ChangeEvent, RefObject, useRef, useState } from "react";
 import SoSBoard from "./components/SoSBoard";
 import ThreeColumnLayout from "./components/ThreeColumnLayout";
 import { GeneralSoSGame, SimpleSoSGame } from "./features/sosGame";
-import { Player } from "./features/player";
+import { ComputerPlayer, Player } from "./features/player";
 
 const BOARD_SIZES = [
   [3, 3],
@@ -13,27 +13,36 @@ const BOARD_SIZES = [
   [8, 8],
 ];
 
-const bluePlayer = new Player("Blue Player", "S");
-const redPlayer = new Player("Red Player", "O");
+let bluePlayer = new Player("Blue Player", "S");
+let redPlayer = new Player("Red Player", "O");
+let sosPlayers = [bluePlayer, redPlayer]
 
-let sosGame = new SimpleSoSGame([bluePlayer, redPlayer], 3, 3, bluePlayer);
+const simpleSoSGame = new SimpleSoSGame(sosPlayers, 3, 3, bluePlayer);
+const generalSoSGame = new GeneralSoSGame(sosPlayers, 3, 3, bluePlayer)
+let sosGameToRender: SimpleSoSGame | GeneralSoSGame = simpleSoSGame
 
 function App() {
-  const [displayedSize, setDisplayedSize] = useState(sosGame.board.size);
-  const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(sosGame.getWhoseTurnIsIt().getPlayerName(),);
+  const [displayedSize, setDisplayedSize] = useState(simpleSoSGame.board.size);
+  const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(simpleSoSGame.getWhoseTurnIsIt().getPlayerName(),);
   const [redPlayerSoSCount, setRedPlayerSoSCount] = useState(redPlayer.sosCount,);
   const [bluePlayerSoSCount, setBluePlayerSoSCount] = useState(redPlayer.sosCount,);
   const [displayWinner, setDisplayedWinner] = useState<undefined | Player>(undefined);
   const [renderGameMode, setRenderedGameMode] = useState<string>("SIMPLE")
+  const [renderPlayer, setRenderPlayer] = useState<boolean>(true)
+  const cellComponents = useRef<HTMLDivElement>(null)
 
-  const bluePlayerSymbolInput = {
-    ref: useRef<HTMLFormElement>(null),
-    inputName: "blue-player-symbol",
+  const bluePlayerInput = {
+    symbolRef: useRef<HTMLFormElement>(null),
+    playerTypeRef: useRef<HTMLFormElement>(null),
+    symbolInputName: "blue-player-symbol",
+    playerTypeInputName: "blue-player-type"
   };
 
-  const redPlayerSymbolInput = {
-    ref: useRef<HTMLFormElement>(null),
-    inputName: "red-player-symbol",
+  const redPlayerInput = {
+    symbolRef: useRef<HTMLFormElement>(null),
+    playerTypeRef: useRef<HTMLFormElement>(null),
+    symbolInputName: "red-player-symbol",
+    playerTypeInputName: "red-player-type"
   };
 
   const gameModeInput = useRef<HTMLFormElement>(null);
@@ -42,67 +51,80 @@ function App() {
     setDisplayedPlayersTurn(nextPlayerTurn.getPlayerName());
   };
 
-  const selectPlayerSymbol = (
-    playerSymbolInput: {
-      ref: RefObject<HTMLFormElement | null>;
-      inputName: string;
-    },
-    player: Player,
-  ) => {
-    if (playerSymbolInput.ref.current) {
-      const selectedPlayerSymbol = playerSymbolInput.ref.current.querySelector(
-        `input[name="${playerSymbolInput.inputName}"]:checked`,
-      ) as HTMLInputElement;
+  const selectPlayerSymbol = (playerInput: {symbolRef: RefObject<HTMLFormElement | null>; symbolInputName: string;}, player: Player,) => {
+    if (playerInput.symbolRef.current) {
+      const selectedPlayerSymbol = playerInput.symbolRef.current.querySelector(`input[name="${playerInput.symbolInputName}"]:checked`,) as HTMLInputElement;
       player.setPlayerSymbol(selectedPlayerSymbol.value);
     }
   };
 
+  const selectPlayerType = (playerInput: {playerTypeRef: RefObject<HTMLFormElement | null>; playerTypeInputName: string;}, player: Player) => {
+    if (playerInput.playerTypeRef.current) {
+      const selectedPlayerType = playerInput.playerTypeRef.current.querySelector(`input[name="${playerInput.playerTypeInputName}"]:checked`,) as HTMLInputElement;
+
+      if (selectedPlayerType.value == "HUMAN") {
+        console.log("HUMAN selected")
+        player = new Player(player.getPlayerName(), player.getPlayerSymbol())
+      } else if(selectedPlayerType.value == "COMPUTER") {
+        if(playerInput.playerTypeInputName == bluePlayerInput.playerTypeInputName) {
+          bluePlayer = new ComputerPlayer(
+            player.getPlayerName(),
+            player.getPlayerSymbol(),
+            true,
+            sosGameToRender,
+            cellComponents,
+            [setBluePlayerSoSCount, setRedPlayerSoSCount],
+            switchDisplayedPlayersTurn,
+            setDisplayedWinner
+          )
+
+          sosPlayers = [bluePlayer, redPlayer]
+
+          sosGameToRender.setPlayers(sosPlayers)
+        } else {
+          redPlayer = new ComputerPlayer(
+            player.getPlayerName(),
+            player.getPlayerSymbol(),
+            true,
+            sosGameToRender,
+            cellComponents,
+            [setBluePlayerSoSCount, setRedPlayerSoSCount],
+            switchDisplayedPlayersTurn,
+            setDisplayedWinner
+          )
+          
+          sosPlayers = [bluePlayer, redPlayer]
+          
+          sosGameToRender.setPlayers(sosPlayers)
+        }
+      }
+
+      setTimeout(() => {
+        console.log('sosGame from App.tsx')
+        console.log(sosGameToRender)
+        setRenderPlayer((prevValue) => !prevValue)
+      }, 1000)
+    }
+  }
+
   const selectBoardSize = (e: ChangeEvent<HTMLSelectElement>) => {
     const boardSize = Number(e.target.value);
+    simpleSoSGame.board.setBoardSize(boardSize, boardSize)
+    generalSoSGame.board.setBoardSize(boardSize, boardSize)
 
-    if (gameModeInput.current) {
-      const selectedGameMode = gameModeInput.current.querySelector(
-        `input[name="game-mode"]:checked`,
-      ) as HTMLInputElement;
-
-      if (selectedGameMode.value == "SIMPLE") {
-        sosGame = new SimpleSoSGame(
-          [bluePlayer, redPlayer],
-          boardSize,
-          boardSize,
-          bluePlayer,
-        );
-      } else if (selectedGameMode.value == "GENERAL") {
-        sosGame = new GeneralSoSGame(
-          [bluePlayer, redPlayer],
-          boardSize,
-          boardSize,
-          bluePlayer,
-        );
-      }
-    }
-    setDisplayedSize([boardSize, boardSize]);
+    setTimeout(() => {setDisplayedSize([boardSize, boardSize])}, 1000)
+    
   };
 
   const selectGameMode = (e: ChangeEvent<HTMLInputElement>) => {
     const setGameMode = e.target.value;
 
     if (setGameMode == "SIMPLE") {
-      sosGame = new SimpleSoSGame(
-        [bluePlayer, redPlayer],
-        displayedSize[0],
-        displayedSize[1],
-        bluePlayer,
-      );
-      setRenderedGameMode("SIMPLE")
+      sosGameToRender = simpleSoSGame
+      setTimeout(() => {setRenderedGameMode("SIMPLE")}, 1000)
     } else if (setGameMode == "GENERAL") {
-      sosGame = new GeneralSoSGame(
-        [bluePlayer, redPlayer],
-        displayedSize[0],
-        displayedSize[1],
-        bluePlayer,
-      );
-      setRenderedGameMode("GENERAL")
+      sosGameToRender = generalSoSGame
+      setTimeout(() => {setRenderedGameMode("GENERAL")}, 1000)
     }
   };
 
@@ -111,29 +133,22 @@ function App() {
       <ThreeColumnLayout layoutLevel="root" gap="16px">
         <ThreeColumnLayout.LeftColumn columnPercent={25}>
           <p>Blue Player</p>
+
+          <form ref={bluePlayerInput.playerTypeRef}>
+            <label><input type="radio" name={bluePlayerInput.playerTypeInputName} onChange={() => {selectPlayerType(bluePlayerInput, bluePlayer);}} value="HUMAN" defaultChecked={true}></input>
+              Human
+            </label>
+            <label><input type="radio" name={bluePlayerInput.playerTypeInputName} onChange={() => { selectPlayerType(bluePlayerInput, bluePlayer);}} value="COMPUTER"></input>
+              Computer
+            </label>
+          </form>
+
           <p>SoS Count: {bluePlayerSoSCount}</p>
-          <form ref={bluePlayerSymbolInput.ref}>
-            <label>
-              <input
-                type="radio"
-                name={bluePlayerSymbolInput.inputName}
-                onChange={() => {
-                  selectPlayerSymbol(bluePlayerSymbolInput, bluePlayer);
-                }}
-                value="S"
-                defaultChecked={true}
-              ></input>
+          <form ref={bluePlayerInput.symbolRef}>
+            <label><input type="radio" name={bluePlayerInput.symbolInputName} onChange={() => {selectPlayerSymbol(bluePlayerInput, bluePlayer);}} value="S" defaultChecked={true}></input>
               S
             </label>
-            <label>
-              <input
-                type="radio"
-                name={bluePlayerSymbolInput.inputName}
-                onChange={() => {
-                  selectPlayerSymbol(bluePlayerSymbolInput, bluePlayer);
-                }}
-                value="O"
-              ></input>
+            <label><input type="radio" name={bluePlayerInput.symbolInputName} onChange={() => { selectPlayerSymbol(bluePlayerInput, bluePlayer);}} value="O"></input>
               O
             </label>
           </form>
@@ -180,15 +195,17 @@ function App() {
 
           <div>
             <span className="hidden">{displayedSize}</span>
-            <span>{renderGameMode}</span>
+            <span>{renderGameMode} </span>
+            <span>{renderPlayer == true ? '`' : '*'}</span>
             <SoSBoard
-              sosGame={sosGame}
+              sosGame={sosGameToRender}
               switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
               setDisplayedPlayersSoSCount={[
                 setBluePlayerSoSCount,
                 setRedPlayerSoSCount,
               ]}
               setDisplayedWinner={setDisplayedWinner}
+              cellComponents={cellComponents}
             />
           </div>
 
@@ -200,30 +217,23 @@ function App() {
         </ThreeColumnLayout.MiddleColumn>
 
         <ThreeColumnLayout.RightColumn columnPercent={25}>
-          <p>Red Player Column</p>
+          <p>Red Player</p>
+
+          <form ref={redPlayerInput.playerTypeRef}>
+            <label><input type="radio" name={redPlayerInput.playerTypeInputName} onChange={() => {selectPlayerType(redPlayerInput, redPlayer);}} value="HUMAN" defaultChecked={true}></input>
+              Human
+            </label>
+            <label><input type="radio" name={redPlayerInput.playerTypeInputName} onChange={() => { selectPlayerType(redPlayerInput, redPlayer);}} value="COMPUTER"></input>
+              Computer
+            </label>
+          </form>
+
           <p>SoS Count: {redPlayerSoSCount}</p>
-          <form ref={redPlayerSymbolInput.ref}>
-            <label>
-              <input
-                type="radio"
-                name={redPlayerSymbolInput.inputName}
-                onChange={() => {
-                  selectPlayerSymbol(redPlayerSymbolInput, redPlayer);
-                }}
-                value="S"
-              ></input>
+          <form ref={redPlayerInput.symbolRef}>
+            <label><input type="radio" name={redPlayerInput.symbolInputName} onChange={() => { selectPlayerSymbol(redPlayerInput, redPlayer)}} value="S" ></input>
               S
             </label>
-            <label>
-              <input
-                type="radio"
-                name={redPlayerSymbolInput.inputName}
-                onChange={() => {
-                  selectPlayerSymbol(redPlayerSymbolInput, redPlayer);
-                }}
-                value="O"
-                defaultChecked={true}
-              ></input>
+            <label><input type="radio" name={redPlayerInput.symbolInputName} onChange={() => { selectPlayerSymbol(redPlayerInput, redPlayer)}} value="O" defaultChecked={true} ></input>
               O
             </label>
           </form>
