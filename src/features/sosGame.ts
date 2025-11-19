@@ -1,5 +1,5 @@
 import { Board, CellValuesType } from "./board";
-import { Player } from "./player";
+import { ComputerPlayer, Player } from "./player";
 import { computePossibleSoSCombinations } from "./sosCombinations";
 
 const allowedCellValues: CellValuesType<string> = {
@@ -11,17 +11,14 @@ const allowedCellValues: CellValuesType<string> = {
 export abstract class SoSGame {
   public board: Board<string>;
   public turnCount: number = 1
-  public totalCells: number
+  public winner: Player | undefined
   private players: Player[];
-  private totalRows: number = 3;
-  private totalColumns: number = 3;
   private whoseTurnIsIt: Player;
 
   constructor(players: Player[], totalRows: number, totalColumns: number,whoseTurnIsIt: Player) {
     this.board = new Board(allowedCellValues, totalRows, totalColumns, true);
     this.players = players;
     this.turnCount = 0
-    this.totalCells = this.totalRows * this.totalColumns
     this.whoseTurnIsIt = whoseTurnIsIt;
   }
 
@@ -29,13 +26,31 @@ export abstract class SoSGame {
     return this.players;
   }
 
+  public setPlayers(players: Player[]) {
+    this.players = players
+  }
+
   public getWhoseTurnIsIt(): Player {
     return this.whoseTurnIsIt;
   }
 
-  public setWhoseTurnIsIt(player: Player) {
+  public setWhoseTurnIsIt(player: Player | ComputerPlayer) {
     this.whoseTurnIsIt = player;
   }
+
+  public decideNextPlayersTurn() {
+    const currentPlayersTurn = this.getWhoseTurnIsIt();
+
+    if (currentPlayersTurn.getPlayerName() == this.getPlayers()[0].getPlayerName()) {
+      // Current Turn is on Blue Player so set next turn to Red Player
+      return this.getPlayers()[1];
+    } else if (currentPlayersTurn.getPlayerName() == this.getPlayers()[1].getPlayerName()) { 
+      // Current Turn is on Red Player so set next turn to Blue Player
+      return this.getPlayers()[0];
+    } else {
+      return this.getPlayers()[0]
+    }
+  };
 
   private isCellOccupied(rowIndex: number, columnIndex: number) {
     const currentCellValue = this.board.getCellValue(rowIndex, columnIndex)[0];
@@ -74,10 +89,8 @@ export abstract class SoSGame {
         const cellOneValue = this.board.getCellValue(cellOneIndex[0], cellOneIndex[1])[0]
         const cellTwoValue = this.board.getCellValue(cellTwoIndex[0], cellTwoIndex[1])[0]
         const cellThreeValue = this.board.getCellValue(cellThreeIndex[0], cellThreeIndex[1])[0]
-        // console.log(cellOneValue, cellTwoValue, cellThreeValue)
 
         if (cellOneValue == allowedCellValues.S && cellTwoValue == allowedCellValues.O && cellThreeValue == allowedCellValues.S) {
-          console.log('SOS detected')
 
           // See which player's sosCount we have to increment
           const cellOneOwnedBy = this.board.getCellValue(cellOneIndex[0], cellOneIndex[1])[1]
@@ -90,14 +103,12 @@ export abstract class SoSGame {
             // Case 1: All 3 cells of SOS are made by the same player
             if (cellOneOwnedBy == player && cellTwoOwnedBy == player && cellThreeOwnedBy == player) {
               player.sosCount += 1
-              console.log(`${player.getPlayerName()} sosCount =  ${player.sosCount}`)
             // Case 2: Two consecutive cells (SO) of the SOS are made by the same player
             } else if (cellOneOwnedBy == player && cellTwoOwnedBy == player || cellTwoOwnedBy == player && cellThreeOwnedBy == player) {
               player.sosCount += 1
-              console.log(`${player.getPlayerName()} sosCount =  ${player.sosCount}`)
             // Case 3: Draw: No player sosCount is incremented
             } else {
-              console.log('Draw. No player sosCount incremented')
+              // console.log('Draw. No player sosCount incremented')
               ;
             }
           }
@@ -115,10 +126,10 @@ export class SimpleSoSGame extends SoSGame {
   }
 
   public determineWinner() {
-    console.log("Implement determineWinner() for SimpleSoSGame");
-
+    // Whichever Player's sosCount reaches 1 first, wins
     for (let i = 0; i < this.getPlayers().length; i++) {
       if (this.getPlayers()[i].sosCount == 1) {
+        this.winner = this.getPlayers()[i]
         return this.getPlayers()[i]
       }
     }
@@ -132,15 +143,13 @@ export class GeneralSoSGame extends SoSGame {
   }
 
   public determineWinner() {
-    console.log("Implement determineWinner() for GeneralSoSGame");
-    console.log(`this.totalCells = ${this.totalCells}`)
-
-    if (this.turnCount == this.totalCells) { // All cells have been filled up
+    if (this.turnCount == this.board.totalCells) { // All cells have been filled up
       const playerSoSCounts = this.getPlayers().map(player => player.sosCount)
       
       if(Math.max(...playerSoSCounts) > 0) {
         for (let i = 0; i < this.getPlayers().length; i++) {
           if (this.getPlayers()[i].sosCount == Math.max(...playerSoSCounts)) {
+            this.winner = this.getPlayers()[i]
             return this.getPlayers()[i]
           }
         }
