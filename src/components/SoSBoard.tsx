@@ -1,7 +1,6 @@
 import { RefObject, useState } from "react";
 import { SoSGame } from "@/features/sosGame";
 import { ComputerPlayer, Player } from "@/features/player";
-import { ChartNoAxesColumnDecreasing } from "lucide-react";
 
 type SoSBoardProps = {
   sosGame: SoSGame;
