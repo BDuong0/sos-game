@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { RefObject, useState } from "react";
 import { SoSGame } from "@/features/sosGame";
-import { Player } from "@/features/player";
+import { ComputerPlayer, Player } from "@/features/player";
+import { ChartNoAxesColumnDecreasing } from "lucide-react";
 
 type SoSBoardProps = {
   sosGame: SoSGame;
   switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void;
   setDisplayedPlayersSoSCount: React.Dispatch<React.SetStateAction<number>>[]
-  setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>
+  setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>,
+  cellComponents: RefObject<HTMLDivElement | null>
 };
 
-const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn, setDisplayedPlayersSoSCount, setDisplayedWinner}: SoSBoardProps) => {
+const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn, setDisplayedPlayersSoSCount, setDisplayedWinner, cellComponents}: SoSBoardProps) => {
   function showGridCells() {
     return sosGame.board.grid.flatMap((rows, rowIndex) =>
       rows.map((_, columnIndex) => (
@@ -28,6 +30,7 @@ const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn, setDisplayedPlayersSoSC
 
   return (
     <div
+      ref={cellComponents}
       style={{
         display: "grid",
         gridTemplateColumns: `repeat(${sosGame.board.size[1]}, minmax(0, 1fr))`,
@@ -75,7 +78,6 @@ const BoardCell = ({
   const placeSymbolInCell = (
     rowIndex: number,
     columnIndex: number,
-    nextPlayersTurn: Player,
   ) => {
     setDisplayedCellValue(sosGame.getWhoseTurnIsIt().getPlayerSymbol());
 
@@ -98,28 +100,23 @@ const BoardCell = ({
     if (winner) {
       setDisplayedWinner(winner)
     }
-
+ 
+    const nextPlayersTurn = sosGame.decideNextPlayersTurn()
     sosGame.setWhoseTurnIsIt(nextPlayersTurn);
     switchDisplayedPlayersTurn(nextPlayersTurn);
-  };
-
-  const decideNextPlayersTurn = () => {
-    const currentPlayersTurn = sosGame.getWhoseTurnIsIt();
-    const [bluePlayer, redPlayer] = sosGame.getPlayers();
-
-    if (currentPlayersTurn == redPlayer) {
-      return bluePlayer;
-    } else {
-      return redPlayer;
+    
+    // Computer Player specific code
+    if (nextPlayersTurn instanceof ComputerPlayer) {
+      nextPlayersTurn.makeMove()
     }
   };
 
   return (
-    <div className="border-2 border-solid border-black">
+    <div className="border-2 border-solid border-black" data-cellIndex={`${rowIndex} ${columnIndex}`}>
       <button
         className="h-full w-full cursor-pointer"
         onClick={() => {
-          placeSymbolInCell(rowIndex, columnIndex, decideNextPlayersTurn());
+          placeSymbolInCell(rowIndex, columnIndex);
         }}
       >
         {displayPlayerSymbol()}
