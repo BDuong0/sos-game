@@ -3,6 +3,7 @@ export type CellValuesType<V> = { empty: V } & Record<string, V>;
 export class Board<T> {
   public grid: (keyof CellValuesType<T> | [keyof CellValuesType<T>, any])[][];
   public size: number[];
+  public totalCells: number
 
   constructor(
     public readonly cellValues: CellValuesType<T>,
@@ -12,6 +13,7 @@ export class Board<T> {
   ) {
     this.rows = this.isBoardSizeValid(rows, columns) ? rows : 3;
     this.columns = this.isBoardSizeValid(rows, columns) ? columns : 3;
+    this.totalCells = rows * columns
     this.setCellValuesAsArray = setCellValuesAsArray
 
     const initialCellValue = this.createInitialCellValue();
@@ -45,8 +47,11 @@ export class Board<T> {
   public setBoardSize(rowCount: number, columnCount: number) {
     this.rows = rowCount;
     this.columns = columnCount;
-    this.grid = Array.from({ length: this.rows }, () => Array(this.columns).fill(0));
+
+    const initialCellValue = this.createInitialCellValue();
+    this.grid = Array.from({ length: this.rows }, () => Array(this.columns).fill(initialCellValue));
     this.size = [this.rows, this.columns];
+    this.totalCells = rowCount * columnCount
   }
 
   public getCellValue(rowIndex: number, columnIndex: number): keyof CellValuesType<T> | [keyof CellValuesType<T>, any] {
