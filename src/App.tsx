@@ -17,19 +17,22 @@ let bluePlayer = new Player("Blue Player", "S");
 let redPlayer = new Player("Red Player", "O");
 let sosPlayers = [bluePlayer, redPlayer]
 
-const simpleSoSGame = new SimpleSoSGame(sosPlayers, 3, 3, bluePlayer);
-const generalSoSGame = new GeneralSoSGame(sosPlayers, 3, 3, bluePlayer)
+let simpleSoSGame = new SimpleSoSGame(sosPlayers, 3, 3, bluePlayer);
+let generalSoSGame = new GeneralSoSGame(sosPlayers, 3, 3, bluePlayer)
 let sosGameToRender: SimpleSoSGame | GeneralSoSGame = simpleSoSGame
 
 function App() {
-  const [displayedSize, setDisplayedSize] = useState(simpleSoSGame.board.size);
+  const [displayedBoardSize, setDisplayedBoardSize] = useState(simpleSoSGame.board.size);
   const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(simpleSoSGame.getWhoseTurnIsIt().getPlayerName(),);
-  const [redPlayerSoSCount, setRedPlayerSoSCount] = useState(redPlayer.sosCount,);
-  const [bluePlayerSoSCount, setBluePlayerSoSCount] = useState(redPlayer.sosCount,);
-  const [displayWinner, setDisplayedWinner] = useState<undefined | Player>(undefined);
-  const [renderGameMode, setRenderedGameMode] = useState<string>("SIMPLE")
-  const [renderPlayer, setRenderPlayer] = useState<boolean>(true)
+  const [displayedWinner, setDisplayedWinner] = useState<undefined | Player>(undefined);
+  const [displayedGameMode, setDisplayedGameMode] = useState<"SIMPLE" | "GENERAL">("SIMPLE")
+  const [displayedRedPlayerSoSCount, setDisplayedRedPlayerSoSCount] = useState(redPlayer.sosCount,);
+  const [displayedBluePlayerSoSCount, setDisplayedBluePlayerSoSCount] = useState(redPlayer.sosCount,);
+  const [renderSoSBoard, setRenderSoSBoard] = useState<boolean>(true)
   const cellComponents = useRef<HTMLDivElement>(null)
+  // Create ref for id="board-sizes", in createNewGame, set the ref.current selected to 3x3
+  const boardSizeDropdown = useRef<HTMLSelectElement>(null);
+  const gameModeInput = useRef<HTMLFormElement>(null);
 
   const bluePlayerInput = {
     symbolRef: useRef<HTMLFormElement>(null),
@@ -44,8 +47,6 @@ function App() {
     symbolInputName: "red-player-symbol",
     playerTypeInputName: "red-player-type"
   };
-
-  const gameModeInput = useRef<HTMLFormElement>(null);
 
   const switchDisplayedPlayersTurn = (nextPlayerTurn: Player) => {
     setDisplayedPlayersTurn(nextPlayerTurn.getPlayerName());
@@ -73,7 +74,7 @@ function App() {
             true,
             sosGameToRender,
             cellComponents,
-            [setBluePlayerSoSCount, setRedPlayerSoSCount],
+            [setDisplayedBluePlayerSoSCount, setDisplayedRedPlayerSoSCount],
             switchDisplayedPlayersTurn,
             setDisplayedWinner
           )
@@ -88,7 +89,7 @@ function App() {
             true,
             sosGameToRender,
             cellComponents,
-            [setBluePlayerSoSCount, setRedPlayerSoSCount],
+            [setDisplayedBluePlayerSoSCount, setDisplayedRedPlayerSoSCount],
             switchDisplayedPlayersTurn,
             setDisplayedWinner
           )
@@ -98,12 +99,6 @@ function App() {
           sosGameToRender.setPlayers(sosPlayers)
         }
       }
-
-      setTimeout(() => {
-        console.log('sosGame from App.tsx')
-        console.log(sosGameToRender)
-        setRenderPlayer((prevValue) => !prevValue)
-      }, 1000)
     }
   }
 
@@ -112,7 +107,7 @@ function App() {
     simpleSoSGame.board.setBoardSize(boardSize, boardSize)
     generalSoSGame.board.setBoardSize(boardSize, boardSize)
 
-    setTimeout(() => {setDisplayedSize([boardSize, boardSize])}, 1000)
+    setTimeout(() => {setDisplayedBoardSize([boardSize, boardSize])}, 1000)
     
   };
 
@@ -121,12 +116,47 @@ function App() {
 
     if (setGameMode == "SIMPLE") {
       sosGameToRender = simpleSoSGame
-      setTimeout(() => {setRenderedGameMode("SIMPLE")}, 1000)
+      setTimeout(() => {setDisplayedGameMode("SIMPLE")}, 1000)
     } else if (setGameMode == "GENERAL") {
       sosGameToRender = generalSoSGame
-      setTimeout(() => {setRenderedGameMode("GENERAL")}, 1000)
+      setTimeout(() => {setDisplayedGameMode("GENERAL")}, 1000)
     }
   };
+
+  const createNewGame = () => {
+    bluePlayer = new Player("Blue Player", "S")
+    redPlayer = new Player("Red Player", "O");
+    sosPlayers = [bluePlayer, redPlayer]
+    simpleSoSGame = new SimpleSoSGame(sosPlayers, 3, 3, bluePlayer);
+    generalSoSGame = new GeneralSoSGame(sosPlayers, 3, 3, bluePlayer)
+    sosGameToRender = simpleSoSGame
+
+    // Reset UI radio buttons and dropdowns
+    const bluePlayerSRadioButton = bluePlayerInput.symbolRef.current?.querySelector(`input[value="S"]`) as HTMLInputElement;
+    if (bluePlayerSRadioButton.checked != true) bluePlayerSRadioButton.checked = true
+    const bluePlayerHumanRadioButton = bluePlayerInput.playerTypeRef.current?.querySelector(`input[value="HUMAN"]`) as HTMLInputElement;
+    if (bluePlayerHumanRadioButton.checked != true) bluePlayerHumanRadioButton.checked = true
+    setDisplayedRedPlayerSoSCount(bluePlayer.sosCount)
+
+    const redPlayerORadioButton = redPlayerInput.symbolRef.current?.querySelector(`input[value="O"]`) as HTMLInputElement;
+    if (redPlayerORadioButton.checked != true) redPlayerORadioButton.checked = true
+    const redPlayerHumanRadioButton = redPlayerInput.playerTypeRef.current?.querySelector(`input[value="HUMAN"]`) as HTMLInputElement;
+    if (redPlayerHumanRadioButton.checked != true) redPlayerHumanRadioButton.checked = true
+    setDisplayedRedPlayerSoSCount(redPlayer.sosCount)
+
+    if (boardSizeDropdown.current && boardSizeDropdown.current.value != "3") boardSizeDropdown.current.value = "3"
+
+    const simpleGameModeButton = gameModeInput.current?.querySelector(`input[value="SIMPLE"]`) as HTMLInputElement;
+    if (simpleGameModeButton.checked != true) simpleGameModeButton.checked = true
+
+    setDisplayedBoardSize([3, 3])
+    setDisplayedGameMode("SIMPLE")
+    setDisplayedPlayersTurn(sosGameToRender.getWhoseTurnIsIt().getPlayerName())
+
+    // 'Rerender' SoSBoard by manually unmounting and remounting <SoSBoard/>
+    setTimeout(() => {setRenderSoSBoard((prevValue) => !prevValue)}, 10)
+    setTimeout(() => {setRenderSoSBoard((prevValue) => !prevValue)}, 100)
+  }
 
   return (
     <main>
@@ -143,7 +173,7 @@ function App() {
             </label>
           </form>
 
-          <p>SoS Count: {bluePlayerSoSCount}</p>
+          <p>SoS Count: {displayedBluePlayerSoSCount}</p>
           <form ref={bluePlayerInput.symbolRef}>
             <label><input type="radio" name={bluePlayerInput.symbolInputName} onChange={() => {selectPlayerSymbol(bluePlayerInput, bluePlayer);}} value="S" defaultChecked={true}></input>
               S
@@ -158,28 +188,18 @@ function App() {
           <div className="flex gap-6">
             <form ref={gameModeInput} className="flex gap-3">
               <label>
-                <input
-                  type="radio"
-                  name="game-mode"
-                  onChange={selectGameMode}
-                  defaultChecked={true}
-                  value="SIMPLE"
-                ></input>
+                <input type="radio" name="game-mode" onChange={selectGameMode} defaultChecked={true} value="SIMPLE"></input>
                 Simple Game
               </label>
               <label>
-                <input
-                  type="radio"
-                  name="game-mode"
-                  onChange={selectGameMode}
-                  value="GENERAL"
+                <input type="radio" name="game-mode" onChange={selectGameMode} value="GENERAL"
                 ></input>
                 General Game
               </label>
             </form>
 
             <label htmlFor="board-sizes">Board Size:</label>
-            <select id="board-sizes" onChange={selectBoardSize}>
+            <select ref={boardSizeDropdown} id="board-sizes" onChange={selectBoardSize}>
               {BOARD_SIZES.map((size) => {
                 const rowCount = size[0];
                 const columnCount = size[1];
@@ -194,26 +214,31 @@ function App() {
           </div>
 
           <div>
-            <span className="hidden">{displayedSize}</span>
-            <span>{renderGameMode} </span>
-            <span>{renderPlayer == true ? '`' : '*'}</span>
-            <SoSBoard
-              sosGame={sosGameToRender}
-              switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
-              setDisplayedPlayersSoSCount={[
-                setBluePlayerSoSCount,
-                setRedPlayerSoSCount,
-              ]}
-              setDisplayedWinner={setDisplayedWinner}
-              cellComponents={cellComponents}
-            />
+            <span className="hidden">{displayedBoardSize}</span>
+            <span>{displayedGameMode} </span>
+            <span>{renderSoSBoard == true ? '`' : '*'}</span>
+            <div>
+              {renderSoSBoard == true && 
+                <SoSBoard
+                  sosGame={sosGameToRender}
+                  switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
+                  setDisplayedPlayersSoSCount={[
+                    setDisplayedBluePlayerSoSCount,
+                    setDisplayedRedPlayerSoSCount,
+                  ]}
+                  setDisplayedWinner={setDisplayedWinner}
+                  cellComponents={cellComponents}
+                />
+              }
+            </div>
           </div>
 
           <p>Current Turn: {displayedPlayersTurn}</p>
           <p>
             Winner:{" "}
-            {displayWinner == undefined ? "none" : displayWinner.getPlayerName()}
+            {displayedWinner == undefined ? "none" : displayedWinner.getPlayerName()}
           </p>
+          <button className="border-2 cursor-pointer hover:bg-neutral-200" onClick={createNewGame}>New Game</button>
         </ThreeColumnLayout.MiddleColumn>
 
         <ThreeColumnLayout.RightColumn columnPercent={25}>
@@ -228,7 +253,7 @@ function App() {
             </label>
           </form>
 
-          <p>SoS Count: {redPlayerSoSCount}</p>
+          <p>SoS Count: {displayedRedPlayerSoSCount}</p>
           <form ref={redPlayerInput.symbolRef}>
             <label><input type="radio" name={redPlayerInput.symbolInputName} onChange={() => { selectPlayerSymbol(redPlayerInput, redPlayer)}} value="S" ></input>
               S

@@ -10,7 +10,7 @@ type SoSBoardProps = {
   cellComponents: RefObject<HTMLDivElement | null>
 };
 
-const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn, setDisplayedPlayersSoSCount, setDisplayedWinner, cellComponents}: SoSBoardProps) => {
+const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn, setDisplayedPlayersSoSCount, setDisplayedWinner, cellComponents}: SoSBoardProps) => {  
   function showGridCells() {
     return sosGame.board.grid.flatMap((rows, rowIndex) =>
       rows.map((_, columnIndex) => (
@@ -64,7 +64,7 @@ const BoardCell = ({
     sosGame.board.grid[rowIndex][columnIndex][0],
   );
 
-  const displayPlayerSymbol = () => {
+  function displayPlayerSymbol() {
     if (displayedCellValue == sosGame.board.cellValues.S) {
       return <span>S</span>;
     } else if (displayedCellValue == sosGame.board.cellValues.O) {
@@ -89,6 +89,7 @@ const BoardCell = ({
     sosGame.detectSOSMade(filledCellIndex[0], filledCellIndex[1]);
     
     for (let i = 0; i < setDisplayedPlayersSoSCount.length ; i++) {
+      // From sosGame.detectSOSMade, 0 players, 1 player or both player's sosCount public properties can be iterated
       setDisplayedPlayersSoSCount[i](sosGame.getPlayers()[i].sosCount)
     }
 
@@ -111,7 +112,7 @@ const BoardCell = ({
   };
 
   return (
-    <div className="border-2 border-solid border-black" data-cellIndex={`${rowIndex} ${columnIndex}`}>
+    <div className="border-2 border-solid border-black" data-cellindex={`${rowIndex} ${columnIndex}`}>
       <button
         className="h-full w-full cursor-pointer"
         onClick={() => {
