@@ -21,6 +21,8 @@ let simpleSoSGame = new SimpleSoSGame(sosPlayers, 3, 3, bluePlayer);
 let generalSoSGame = new GeneralSoSGame(sosPlayers, 3, 3, bluePlayer)
 let sosGameToRender: SimpleSoSGame | GeneralSoSGame = simpleSoSGame
 
+let recordedSoSGame = null
+
 function App() {
   const [displayedBoardSize, setDisplayedBoardSize] = useState(simpleSoSGame.board.size);
   const [displayedPlayersTurn, setDisplayedPlayersTurn] = useState(simpleSoSGame.getWhoseTurnIsIt().getPlayerName(),);
@@ -158,6 +160,18 @@ function App() {
     setTimeout(() => {setRenderSoSBoard((prevValue) => !prevValue)}, 100)
   }
 
+  const toggleRecordGame = (e: ChangeEvent<HTMLInputElement>) => {
+    const checkboxValue: boolean = e.target.checked
+    
+    if (checkboxValue == true) {
+      recordedSoSGame = "Should be instance of RecordedSoSGame"
+      console.log(`recordedSoSGame = ${recordedSoSGame}`)
+    } else if(checkboxValue == false) {
+      recordedSoSGame = null
+      console.log(`recordedSoSGame = ${recordedSoSGame}`)
+    }
+  }
+
   return (
     <main>
       <ThreeColumnLayout layoutLevel="root" gap="16px">
@@ -239,6 +253,7 @@ function App() {
             {displayedWinner == undefined ? "none" : displayedWinner.getPlayerName()}
           </p>
           <button className="border-2 cursor-pointer hover:bg-neutral-200" onClick={createNewGame}>New Game</button>
+          <label className="block"><input type="checkbox" name="record-game" onChange={toggleRecordGame}></input>Record game</label>
         </ThreeColumnLayout.MiddleColumn>
 
         <ThreeColumnLayout.RightColumn columnPercent={25}>
