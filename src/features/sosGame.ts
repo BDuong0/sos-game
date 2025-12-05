@@ -1,6 +1,14 @@
+import { BehaviorSubject } from 'rxjs';
 import { Board, CellValuesType } from "./board";
 import { ComputerPlayer, Player } from "./player";
 import { computePossibleSoSCombinations } from "./sosCombinations";
+
+type latestValidMoveType = [
+  turnCount: number,
+  Player,
+  rowIndex: number,
+  columnIndex: number
+] | []
 
 const allowedCellValues: CellValuesType<string> = {
   empty: "",
@@ -12,14 +20,18 @@ export abstract class SoSGame {
   public board: Board<string>;
   public turnCount: number = 1
   public winner: Player | undefined
+  public latestMoveSubject: BehaviorSubject<latestValidMoveType>
   private players: Player[];
   private whoseTurnIsIt: Player;
+  private _latestValidMove: latestValidMoveType
 
   constructor(players: Player[], totalRows: number, totalColumns: number,whoseTurnIsIt: Player) {
     this.board = new Board(allowedCellValues, totalRows, totalColumns, true);
     this.players = players;
-    this.turnCount = 0
+    this.turnCount = 1
     this.whoseTurnIsIt = whoseTurnIsIt;
+    this._latestValidMove = []
+    this.latestMoveSubject = new BehaviorSubject(this.latestValidMove)
   }
 
   public getPlayers(): Player[] {
@@ -52,6 +64,15 @@ export abstract class SoSGame {
     }
   };
 
+  public get latestValidMove() {
+    return this._latestValidMove;
+  }
+
+  public set latestValidMove(newValue: latestValidMoveType) {
+    this._latestValidMove = newValue;
+    this.latestMoveSubject.next(newValue); // Emit whenever the value changes
+  }
+
   private isCellOccupied(rowIndex: number, columnIndex: number) {
     const currentCellValue = this.board.getCellValue(rowIndex, columnIndex)[0];
 
@@ -74,6 +95,8 @@ export abstract class SoSGame {
     const cellOwnedBy = currentPlayerTurn;
 
     this.board.editCellValue(rowIndex, columnIndex, [cellOwnedBy.getPlayerSymbol(), cellOwnedBy]);
+
+    this.latestValidMove = [this.turnCount, currentPlayerTurn, rowIndex, columnIndex]
   }
 
   public detectSOSMade(rowIndex: number, columnIndex: number){
@@ -143,7 +166,8 @@ export class GeneralSoSGame extends SoSGame {
   }
 
   public determineWinner() {
-    if (this.turnCount == this.board.totalCells) { // All cells have been filled up
+    const numOfFilledCells = this.turnCount - 1 // At the beginning of turn 1, 0 cells are filled up, at the beginning of turn 2, 1 cell is filled, etc(for the rest of the turns).
+    if (numOfFilledCells == this.board.totalCells) { // All cells have been filled up
       const playerSoSCounts = this.getPlayers().map(player => player.sosCount)
       
       if(Math.max(...playerSoSCounts) > 0) {
