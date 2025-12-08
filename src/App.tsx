@@ -3,6 +3,7 @@ import SoSBoard from "./components/SoSBoard";
 import ThreeColumnLayout from "./components/ThreeColumnLayout";
 import { GeneralSoSGame, SimpleSoSGame } from "./features/sosGame";
 import { ComputerPlayer, Player } from "./features/player";
+import { RecordedSoSGame } from "./features/recordedSoSGame";
 
 const BOARD_SIZES = [
   [3, 3],
@@ -21,7 +22,7 @@ let simpleSoSGame = new SimpleSoSGame(sosPlayers, 3, 3, bluePlayer);
 let generalSoSGame = new GeneralSoSGame(sosPlayers, 3, 3, bluePlayer)
 let sosGameToRender: SimpleSoSGame | GeneralSoSGame = simpleSoSGame
 
-let recordedSoSGame = null
+let recordedSoSGame: RecordedSoSGame | null = null
 
 function App() {
   const [displayedBoardSize, setDisplayedBoardSize] = useState(simpleSoSGame.board.size);
@@ -35,6 +36,7 @@ function App() {
   // Create ref for id="board-sizes", in createNewGame, set the ref.current selected to 3x3
   const boardSizeDropdown = useRef<HTMLSelectElement>(null);
   const gameModeInput = useRef<HTMLFormElement>(null);
+  const recordGameCheckbox = useRef<HTMLInputElement>(null)
 
   const bluePlayerInput = {
     symbolRef: useRef<HTMLFormElement>(null),
@@ -164,7 +166,7 @@ function App() {
     const checkboxValue: boolean = e.target.checked
     
     if (checkboxValue == true) {
-      recordedSoSGame = "Should be instance of RecordedSoSGame"
+      recordedSoSGame = new RecordedSoSGame(sosGameToRender)
       console.log(`recordedSoSGame = ${recordedSoSGame}`)
     } else if(checkboxValue == false) {
       recordedSoSGame = null
@@ -250,10 +252,19 @@ function App() {
           <p>Current Turn: {displayedPlayersTurn}</p>
           <p>
             Winner:{" "}
-            {displayedWinner == undefined ? "none" : displayedWinner.getPlayerName()}
+            {displayedWinner == undefined ? "None" : (() => { // This unfamiliar syntax is Javascript immediately invoked function expression (IIFE)
+              if (recordedSoSGame instanceof RecordedSoSGame) { // If 'Record Game' checkbox is checked
+                recordedSoSGame.downloadTextFile()
+                recordedSoSGame = null
+
+                if (recordGameCheckbox.current) {recordGameCheckbox.current.checked = false}
+              }
+
+              return displayedWinner.getPlayerName()
+            })()}
           </p>
           <button className="border-2 cursor-pointer hover:bg-neutral-200" onClick={createNewGame}>New Game</button>
-          <label className="block"><input type="checkbox" name="record-game" onChange={toggleRecordGame}></input>Record game</label>
+          <label className="block"><input ref={recordGameCheckbox} type="checkbox" name="record-game" onChange={toggleRecordGame}></input>Record game</label>
         </ThreeColumnLayout.MiddleColumn>
 
         <ThreeColumnLayout.RightColumn columnPercent={25}>
