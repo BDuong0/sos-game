@@ -78,6 +78,8 @@ const BoardCell = ({
     rowIndex: number,
     columnIndex: number,
   ) => {
+    if (sosGame.winner != undefined) { console.log("Game Ended (from SoSBoard)"); return}
+    
     setDisplayedCellValue(sosGame.getWhoseTurnIsIt().getPlayerSymbol());
 
     const filledCellIndex = sosGame.makeMove(
@@ -101,6 +103,8 @@ const BoardCell = ({
       setDisplayedWinner(winner)
     }
  
+    if (sosGame.winner != undefined) { console.log("Last Turn"); return}
+
     const nextPlayersTurn = sosGame.decideNextPlayersTurn()
     sosGame.setWhoseTurnIsIt(nextPlayersTurn);
     switchDisplayedPlayersTurn(nextPlayersTurn);

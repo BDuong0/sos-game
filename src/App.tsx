@@ -140,7 +140,7 @@ function App() {
     if (bluePlayerSRadioButton.checked != true) bluePlayerSRadioButton.checked = true
     const bluePlayerHumanRadioButton = bluePlayerInput.playerTypeRef.current?.querySelector(`input[value="HUMAN"]`) as HTMLInputElement;
     if (bluePlayerHumanRadioButton.checked != true) bluePlayerHumanRadioButton.checked = true
-    setDisplayedRedPlayerSoSCount(bluePlayer.sosCount)
+    setDisplayedBluePlayerSoSCount(bluePlayer.sosCount)
 
     const redPlayerORadioButton = redPlayerInput.symbolRef.current?.querySelector(`input[value="O"]`) as HTMLInputElement;
     if (redPlayerORadioButton.checked != true) redPlayerORadioButton.checked = true

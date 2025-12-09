@@ -59,6 +59,8 @@ export class ComputerPlayer extends Player {
     }
 
     public makeMove(){
+        if (this.sosGame.winner != undefined) return
+        
         if (this.sosGame.getWhoseTurnIsIt().getPlayerName() == this.getPlayerName()) {
             setTimeout(() => {
                 const emptyCells: number[][] = []
@@ -101,6 +103,8 @@ export class ComputerPlayer extends Player {
                 if (winner) {
                     this.setDisplayedWinner(winner)
                 }
+
+                if (this.sosGame.winner != undefined) return
 
                 const nextPlayersTurn = this.sosGame.decideNextPlayersTurn()
                 this.sosGame.setWhoseTurnIsIt(nextPlayersTurn);
