@@ -4,6 +4,7 @@ import ThreeColumnLayout from "./components/ThreeColumnLayout";
 import { GeneralSoSGame, SimpleSoSGame } from "./features/sosGame";
 import { ComputerPlayer, Player } from "./features/player";
 import { RecordedSoSGame } from "./features/recordedSoSGame";
+import { SoSGameReplayer } from "./features/sosGameReplayer";
 
 const BOARD_SIZES = [
   [3, 3],
@@ -23,6 +24,7 @@ let generalSoSGame = new GeneralSoSGame(sosPlayers, 3, 3, bluePlayer)
 let sosGameToRender: SimpleSoSGame | GeneralSoSGame = simpleSoSGame
 
 let recordedSoSGame: RecordedSoSGame | null = null
+let sosGameReplayer: SoSGameReplayer | null = null
 
 function App() {
   const [displayedBoardSize, setDisplayedBoardSize] = useState(simpleSoSGame.board.size);
@@ -174,6 +176,39 @@ function App() {
     }
   }
 
+  const replayFromTextFile = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      sosGameReplayer = new SoSGameReplayer(
+        e.target.files[0], 
+        sosGameToRender, 
+        sosPlayers,
+        cellComponents,
+        [setDisplayedBluePlayerSoSCount, setDisplayedRedPlayerSoSCount],
+        switchDisplayedPlayersTurn,
+        setDisplayedWinner,
+        setDisplayedBoardSize,
+        setDisplayedGameMode,
+        [setDisplayedBluePlayerSoSCount, setDisplayedRedPlayerSoSCount]
+      )
+      
+      setTimeout(() => {
+        console.log("Post replayFromTextFile")
+
+        if (sosGameReplayer?.getSoSGameToRender()) {
+          sosGameToRender = sosGameReplayer.getSoSGameToRender()
+        }
+
+        console.log(sosGameToRender)
+        if (sosGameToRender instanceof SimpleSoSGame) {console.log("Should be SoS")}
+        if (sosGameToRender instanceof GeneralSoSGame) {console.log("GeneralSoSGame")}
+
+        if (sosGameReplayer) {
+          sosGameReplayer.replayMoves()
+        }
+      }, 1000)
+    }
+  }
+
   return (
     <main>
       <ThreeColumnLayout layoutLevel="root" gap="16px">
@@ -265,6 +300,7 @@ function App() {
           </p>
           <button className="border-2 cursor-pointer hover:bg-neutral-200" onClick={createNewGame}>New Game</button>
           <label className="block"><input ref={recordGameCheckbox} type="checkbox" name="record-game" onChange={toggleRecordGame}></input>Record game</label>
+          <label className="border-2 cursor-pointer hover:bg-neutral-200"><input type="file" accept=".txt" name="replay-game" onChange={replayFromTextFile}></input>Replay game</label>
         </ThreeColumnLayout.MiddleColumn>
 
         <ThreeColumnLayout.RightColumn columnPercent={25}>
