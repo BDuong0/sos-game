@@ -5,12 +5,18 @@ import { ComputerPlayer, Player } from "@/features/player";
 type SoSBoardProps = {
   sosGame: SoSGame;
   switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void;
-  setDisplayedPlayersSoSCount: React.Dispatch<React.SetStateAction<number>>[]
-  setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>,
-  cellComponents: RefObject<HTMLDivElement | null>
+  setDisplayedPlayersSoSCount: React.Dispatch<React.SetStateAction<number>>[];
+  setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>;
+  cellComponents: RefObject<HTMLDivElement | null>;
 };
 
-const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn, setDisplayedPlayersSoSCount, setDisplayedWinner, cellComponents}: SoSBoardProps) => {  
+const SoSBoard = ({
+  sosGame,
+  switchDisplayedPlayersTurn,
+  setDisplayedPlayersSoSCount,
+  setDisplayedWinner,
+  cellComponents,
+}: SoSBoardProps) => {
   function showGridCells() {
     return sosGame.board.grid.flatMap((rows, rowIndex) =>
       rows.map((_, columnIndex) => (
@@ -19,8 +25,8 @@ const SoSBoard = ({ sosGame, switchDisplayedPlayersTurn, setDisplayedPlayersSoSC
           rowIndex={rowIndex}
           columnIndex={columnIndex}
           switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
-          setDisplayedPlayersSoSCount = {setDisplayedPlayersSoSCount}
-          setDisplayedWinner = {setDisplayedWinner}
+          setDisplayedPlayersSoSCount={setDisplayedPlayersSoSCount}
+          setDisplayedWinner={setDisplayedWinner}
           key={`cell-${rowIndex}-${columnIndex}`}
         />
       )),
@@ -47,8 +53,8 @@ interface BoardCellProps {
   rowIndex: number;
   columnIndex: number;
   switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void;
-  setDisplayedPlayersSoSCount: React.Dispatch<React.SetStateAction<number>>[]
-  setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>
+  setDisplayedPlayersSoSCount: React.Dispatch<React.SetStateAction<number>>[];
+  setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>;
 }
 
 const BoardCell = ({
@@ -57,7 +63,7 @@ const BoardCell = ({
   columnIndex,
   switchDisplayedPlayersTurn,
   setDisplayedPlayersSoSCount,
-  setDisplayedWinner
+  setDisplayedWinner,
 }: BoardCellProps) => {
   const [displayedCellValue, setDisplayedCellValue] = useState(
     // sosGame.board.grid[rowIndex][columnIndex] = [string, any]
@@ -72,14 +78,11 @@ const BoardCell = ({
     } else if (displayedCellValue == sosGame.board.cellValues.empty) {
       return <span className="opacity-0">''</span>;
     }
-  };
+  }
 
-  const placeSymbolInCell = (
-    rowIndex: number,
-    columnIndex: number,
-  ) => {
-    if (sosGame.winner != undefined) { console.log("Game Ended (from SoSBoard)"); return}
-    
+  const placeSymbolInCell = (rowIndex: number, columnIndex: number) => {
+    if (sosGame.winner != undefined) return;
+
     setDisplayedCellValue(sosGame.getWhoseTurnIsIt().getPlayerSymbol());
 
     const filledCellIndex = sosGame.makeMove(
@@ -89,34 +92,37 @@ const BoardCell = ({
     );
 
     sosGame.detectSOSMade(filledCellIndex[0], filledCellIndex[1]);
-    
-    for (let i = 0; i < setDisplayedPlayersSoSCount.length ; i++) {
+
+    for (let i = 0; i < setDisplayedPlayersSoSCount.length; i++) {
       // From sosGame.detectSOSMade, 0 players, 1 player or both player's sosCount public properties can be iterated
-      setDisplayedPlayersSoSCount[i](sosGame.getPlayers()[i].sosCount)
+      setDisplayedPlayersSoSCount[i](sosGame.getPlayers()[i].sosCount);
     }
 
-    sosGame.turnCount += 1
+    sosGame.turnCount += 1;
 
-    const winner = sosGame.determineWinner()
+    const winner = sosGame.determineWinner();
 
     if (winner) {
-      setDisplayedWinner(winner)
+      setDisplayedWinner(winner);
     }
- 
-    if (sosGame.winner != undefined) { console.log("Last Turn"); return}
 
-    const nextPlayersTurn = sosGame.decideNextPlayersTurn()
+    if (sosGame.winner != undefined) return; // Runs on the last turn of an SoS game
+
+    const nextPlayersTurn = sosGame.decideNextPlayersTurn();
     sosGame.setWhoseTurnIsIt(nextPlayersTurn);
     switchDisplayedPlayersTurn(nextPlayersTurn);
-    
+
     // Computer Player specific code
     if (nextPlayersTurn instanceof ComputerPlayer) {
-      nextPlayersTurn.makeMove()
+      nextPlayersTurn.makeMove();
     }
   };
 
   return (
-    <div className="border-2 border-solid border-black" data-cellindex={`${rowIndex} ${columnIndex}`}>
+    <div
+      className="border-2 border-solid border-black"
+      data-cellindex={`${rowIndex} ${columnIndex}`}
+    >
       <button
         className="h-full w-full cursor-pointer"
         onClick={() => {
