@@ -2,8 +2,7 @@ import { Player } from '../../src/features/player'
 import { SimpleSoSGame } from '../../src/features/sosGame'
 import { RecordedSoSGame } from '../../src/features/recordedSoSGame'
 
-describe.only("AC 2.1: Record a simple game between two human plahyers", () => {
-  
+describe("AC 22.1: Record a simple game between two human players", () => {
   describe("recording an entire simple SoS Game", () => {
     let bluePlayer = new Player("Blue Player", "S");
     let redPlayer = new Player("Red Player", "O");
