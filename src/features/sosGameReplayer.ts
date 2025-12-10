@@ -142,7 +142,6 @@ export class SoSGameReplayer {
 
             // Replay each recorded move
             for (let i = 0; i < recordedMovesWithNoTurnCount.length; i++) {
-                
                 const [player, symbol, cellIndex] = recordedMovesWithNoTurnCount[i].split(':')
                 let rowIndex: string | number = cellIndex.split("-")[0]
                 let columnIndex: string | number = cellIndex.split("-")[1]
@@ -159,10 +158,13 @@ export class SoSGameReplayer {
                         currentPlayerTurn = this.sosGameToRender.getPlayers()[1] // Red Player
                         this.replayMove(currentPlayerTurn, symbol, rowIndex, columnIndex)
                     }
+
+                    if (this.sosGameToRender.determineWinner() != undefined) {
+                        const winner = this.sosGameToRender.determineWinner()
+                        this.setDisplayedWinner(winner)
+                    }
                 }, i * 1000)
-
             }
-
         };        
 
         reader.readAsText(this.inputTextFile);
@@ -190,11 +192,9 @@ export class SoSGameReplayer {
             this.setDisplayedPlayersSoSCount[i](this.sosGameToRender.getPlayers()[i].sosCount)
         }
         
-        if (this.sosGameToRender.determineWinner() != undefined) {
-            const winner = this.sosGameToRender.determineWinner()
-            this.setDisplayedWinner(winner)
-        } else {
-            this.sosGameToRender.turnCount += 1  
-        }
+        this.sosGameToRender.turnCount += 1  
+        const nextPlayersTurn = this.sosGameToRender.decideNextPlayersTurn();
+        this.sosGameToRender.setWhoseTurnIsIt(nextPlayersTurn);
+        this.switchDisplayedPlayersTurn(nextPlayersTurn);   
     }
 }
