@@ -5,6 +5,10 @@ import { GeneralSoSGame, SimpleSoSGame } from "./features/sosGame";
 import { ComputerPlayer, Player } from "./features/player";
 import { RecordedSoSGame } from "./features/recordedSoSGame";
 import { SoSGameReplayer } from "./features/sosGameReplayer";
+import PlayerSettingsSection from "@/components/PlayerSettingsSection";
+import RadioButton from "@/components/ui/RadioButton";
+import Checkbox from "@/components/ui/Checkbox";
+import Tooltip from "@/components/ui/Tooltip";
 
 const BOARD_SIZES = [
   [3, 3],
@@ -15,8 +19,8 @@ const BOARD_SIZES = [
   [8, 8],
 ];
 
-let bluePlayer = new Player("Blue Player", "S");
-let redPlayer = new Player("Red Player", "O");
+let bluePlayer = new Player("Blue Player", "S", "blue");
+let redPlayer = new Player("Red Player", "O", "red");
 let sosPlayers = [bluePlayer, redPlayer]
 
 let simpleSoSGame = new SimpleSoSGame(sosPlayers, 3, 3, bluePlayer);
@@ -71,12 +75,13 @@ function App() {
 
       if (selectedPlayerType.value == "HUMAN") {
         console.log("HUMAN selected")
-        player = new Player(player.getPlayerName(), player.getPlayerSymbol())
+        player = new Player(player.getPlayerName(), player.getPlayerSymbol(), player.playerColor)
       } else if(selectedPlayerType.value == "COMPUTER") {
         if(playerInput.playerTypeInputName == bluePlayerInput.playerTypeInputName) {
           bluePlayer = new ComputerPlayer(
             player.getPlayerName(),
             player.getPlayerSymbol(),
+            player.playerColor,
             true,
             sosGameToRender,
             cellComponents,
@@ -92,6 +97,7 @@ function App() {
           redPlayer = new ComputerPlayer(
             player.getPlayerName(),
             player.getPlayerSymbol(),
+            player.playerColor,
             true,
             sosGameToRender,
             cellComponents,
@@ -130,8 +136,8 @@ function App() {
   };
 
   const createNewGame = () => {
-    bluePlayer = new Player("Blue Player", "S")
-    redPlayer = new Player("Red Player", "O");
+    bluePlayer = new Player("Blue Player", "S", "blue")
+    redPlayer = new Player("Red Player", "O", "red");
     sosPlayers = [bluePlayer, redPlayer]
     simpleSoSGame = new SimpleSoSGame(sosPlayers, 3, 3, bluePlayer);
     generalSoSGame = new GeneralSoSGame(sosPlayers, 3, 3, bluePlayer)
@@ -209,121 +215,147 @@ function App() {
     }
   }
 
+  const rightAndLeftColumnStyles = "grid place-items-center"
   return (
     <main>
-      <ThreeColumnLayout layoutLevel="root" gap="16px">
-        <ThreeColumnLayout.LeftColumn columnPercent={25}>
-          <p>Blue Player</p>
-
-          <form ref={bluePlayerInput.playerTypeRef}>
-            <label><input type="radio" name={bluePlayerInput.playerTypeInputName} onChange={() => {selectPlayerType(bluePlayerInput, bluePlayer);}} value="HUMAN" defaultChecked={true}></input>
-              Human
-            </label>
-            <label><input type="radio" name={bluePlayerInput.playerTypeInputName} onChange={() => { selectPlayerType(bluePlayerInput, bluePlayer);}} value="COMPUTER"></input>
-              Computer
-            </label>
-          </form>
-
-          <p>SoS Count: {displayedBluePlayerSoSCount}</p>
-          <form ref={bluePlayerInput.symbolRef}>
-            <label><input type="radio" name={bluePlayerInput.symbolInputName} onChange={() => {selectPlayerSymbol(bluePlayerInput, bluePlayer);}} value="S" defaultChecked={true}></input>
-              S
-            </label>
-            <label><input type="radio" name={bluePlayerInput.symbolInputName} onChange={() => { selectPlayerSymbol(bluePlayerInput, bluePlayer);}} value="O"></input>
-              O
-            </label>
-          </form>
+      <ThreeColumnLayout layoutLevel="root" gap="16px" className="h-screen">
+        <ThreeColumnLayout.LeftColumn columnPercent={25} className={rightAndLeftColumnStyles}>
+          <PlayerSettingsSection
+            player={bluePlayer} 
+            symbolRef={bluePlayerInput.symbolRef}
+            playerTypeRef={bluePlayerInput.playerTypeRef}
+            symbolInputName={bluePlayerInput.symbolInputName}
+            playerTypeInputName={bluePlayerInput.playerTypeInputName}
+            selectPlayerType={selectPlayerType}
+            selectPlayerSymbol={selectPlayerSymbol}
+            displayedSoSCount={displayedBluePlayerSoSCount}>
+          </PlayerSettingsSection>
         </ThreeColumnLayout.LeftColumn>
 
-        <ThreeColumnLayout.MiddleColumn columnPercent={50}>
-          <div className="flex gap-6">
-            <form ref={gameModeInput} className="flex gap-3">
-              <label>
-                <input type="radio" name="game-mode" onChange={selectGameMode} defaultChecked={true} value="SIMPLE"></input>
-                Simple Game
-              </label>
-              <label>
-                <input type="radio" name="game-mode" onChange={selectGameMode} value="GENERAL"
-                ></input>
-                General Game
-              </label>
-            </form>
+        <ThreeColumnLayout.MiddleColumn columnPercent={50} className="grid place-items-center">
+          <div className="w-4/5">
+            <div className="text-center">
+              <h1 className="mt-0">SOS game</h1>
+              <p>A variant of the Tic Tac Toe game</p>
+            </div>
+            <h4>Game Settings:</h4>
+            <div className="flex gap-6">
+              <form ref={gameModeInput} className="flex gap-3">
+                <RadioButton name="game-mode" defaultChecked={true} value="SIMPLE" onChange={selectGameMode} >
+                  Simple Game
+                </RadioButton>
+                <RadioButton name="game-mode" value="GENERAL" onChange={selectGameMode}>
+                  General Game
+                </RadioButton>
+              </form>
 
-            <label htmlFor="board-sizes">Board Size:</label>
-            <select ref={boardSizeDropdown} id="board-sizes" onChange={selectBoardSize}>
-              {BOARD_SIZES.map((size) => {
-                const rowCount = size[0];
-                const columnCount = size[1];
+              <div className="flex flex-col">
+                <label htmlFor="board-sizes">Board Size:</label>
+                <select 
+                  ref={boardSizeDropdown} 
+                  id="board-sizes" 
+                  onChange={selectBoardSize}
+                  className="rounded-sm border-1 cursor-pointer px-1"
+                >
+                  {BOARD_SIZES.map((size) => {
+                    const rowCount = size[0];
+                    const columnCount = size[1];
 
-                return (
-                  <option value={rowCount}>
-                    {rowCount}x{columnCount}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
+                    return (
+                      <option value={rowCount}>
+                        {rowCount}x{columnCount}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <button className="border-2" onClick={createNewGame}>
+                New Game
+              </button>
+            </div>
 
-          <div>
-            <span className="hidden">{displayedBoardSize}</span>
-            <span>{displayedGameMode} </span>
-            <span>{renderSoSBoard == true ? '`' : '*'}</span>
             <div>
-              {renderSoSBoard == true && 
-                <SoSBoard
-                  sosGame={sosGameToRender}
-                  switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
-                  setDisplayedPlayersSoSCount={[
-                    setDisplayedBluePlayerSoSCount,
-                    setDisplayedRedPlayerSoSCount,
-                  ]}
-                  setDisplayedWinner={setDisplayedWinner}
-                  cellComponents={cellComponents}
-                />
-              }
+              <span className="hidden">{displayedBoardSize}</span>
+              <span className="hidden">{renderSoSBoard == true ? '`' : '*'}</span>
+              <p className="w-full mt-3 text-center">Current Game Mode: {
+              displayedGameMode == "SIMPLE" ? 
+              <Tooltip text="Each player takes turns placing either an 'S' or an 'O' and the first player that makes an SOS on the board wins the game.">
+                Simple
+              </Tooltip> :
+              <Tooltip text="Each player takes turns placing either an 'S' or an 'O' until the entire board is filled. The player who made more SOS's, indicated by the player with higher score, wins the game.">
+                General
+              </Tooltip>
+              } </p>
+              
+              <div>
+                {renderSoSBoard == true && 
+                  <SoSBoard
+                    sosGame={sosGameToRender}
+                    switchDisplayedPlayersTurn={switchDisplayedPlayersTurn}
+                    setDisplayedPlayersSoSCount={[
+                      setDisplayedBluePlayerSoSCount,
+                      setDisplayedRedPlayerSoSCount,
+                    ]}
+                    setDisplayedWinner={setDisplayedWinner}
+                    cellComponents={cellComponents}
+                  />
+                }
+              </div>
+            </div>
+            
+            <div className="flex justify-around mt-[var(--rhythm-unit)]">
+              <p 
+                className={`${sosGameToRender.getWhoseTurnIsIt().playerColor == "blue" ? "text-blue-500" : "text-red-500"}`}>
+                Current Turn: {displayedPlayersTurn}
+              </p>
+              <p>
+                <span className={displayedWinner == undefined ? "" : "text-green-500"}>
+                  Winner:{" "}
+                </span>
+                {displayedWinner == undefined ? "None" : (() => { // This unfamiliar syntax is Javascript immediately invoked function expression (IIFE)
+                  if (recordedSoSGame instanceof RecordedSoSGame) { // If 'Record Game' checkbox is checked
+                    recordedSoSGame.downloadTextFile()
+                    recordedSoSGame = null
+
+                    if (recordGameCheckbox.current) {recordGameCheckbox.current.checked = false}
+                  }
+
+                  if (displayedWinner.getPlayerName() == "Blue Player") {
+                    return (<span className="text-blue-500">{displayedWinner.getPlayerName()}</span>)
+                  } else {
+                    return (<span className="text-red-500">{displayedWinner.getPlayerName()}</span>)
+                  }
+                })()}
+              </p>
+            </div>
+            
+            <div className="flex gap-6 mb-6">
+              <div>
+                <h4>Record Game</h4>
+                <Checkbox name="record-game" ref={recordGameCheckbox} onChange={toggleRecordGame}>
+                  Record Game
+                </Checkbox>
+              </div>
+              <div>
+                <h4>Replay Game</h4>
+                <label htmlFor="replay-game" className="border-2 cursor-pointer hover:bg-[#404040]">Replay game from file</label>
+                <input id="replay-game" className="w-fit" type="file" accept=".txt" name="replay-game" onChange={replayFromTextFile}></input>
+              </div>
             </div>
           </div>
-
-          <p>Current Turn: {displayedPlayersTurn}</p>
-          <p>
-            Winner:{" "}
-            {displayedWinner == undefined ? "None" : (() => { // This unfamiliar syntax is Javascript immediately invoked function expression (IIFE)
-              if (recordedSoSGame instanceof RecordedSoSGame) { // If 'Record Game' checkbox is checked
-                recordedSoSGame.downloadTextFile()
-                recordedSoSGame = null
-
-                if (recordGameCheckbox.current) {recordGameCheckbox.current.checked = false}
-              }
-
-              return displayedWinner.getPlayerName()
-            })()}
-          </p>
-          <button className="border-2 cursor-pointer hover:bg-neutral-200" onClick={createNewGame}>New Game</button>
-          <label className="block"><input ref={recordGameCheckbox} type="checkbox" name="record-game" onChange={toggleRecordGame}></input>Record game</label>
-          <label className="border-2 cursor-pointer hover:bg-neutral-200"><input type="file" accept=".txt" name="replay-game" onChange={replayFromTextFile}></input>Replay game</label>
         </ThreeColumnLayout.MiddleColumn>
 
-        <ThreeColumnLayout.RightColumn columnPercent={25}>
-          <p>Red Player</p>
-
-          <form ref={redPlayerInput.playerTypeRef}>
-            <label><input type="radio" name={redPlayerInput.playerTypeInputName} onChange={() => {selectPlayerType(redPlayerInput, redPlayer);}} value="HUMAN" defaultChecked={true}></input>
-              Human
-            </label>
-            <label><input type="radio" name={redPlayerInput.playerTypeInputName} onChange={() => { selectPlayerType(redPlayerInput, redPlayer);}} value="COMPUTER"></input>
-              Computer
-            </label>
-          </form>
-
-          <p>SoS Count: {displayedRedPlayerSoSCount}</p>
-          <form ref={redPlayerInput.symbolRef}>
-            <label><input type="radio" name={redPlayerInput.symbolInputName} onChange={() => { selectPlayerSymbol(redPlayerInput, redPlayer)}} value="S" ></input>
-              S
-            </label>
-            <label><input type="radio" name={redPlayerInput.symbolInputName} onChange={() => { selectPlayerSymbol(redPlayerInput, redPlayer)}} value="O" defaultChecked={true} ></input>
-              O
-            </label>
-          </form>
+        <ThreeColumnLayout.RightColumn columnPercent={25} className={rightAndLeftColumnStyles}>
+          <PlayerSettingsSection
+            player={redPlayer} 
+            symbolRef={redPlayerInput.symbolRef}
+            playerTypeRef={redPlayerInput.playerTypeRef}
+            symbolInputName={redPlayerInput.symbolInputName}
+            playerTypeInputName={redPlayerInput.playerTypeInputName}
+            selectPlayerType={selectPlayerType}
+            selectPlayerSymbol={selectPlayerSymbol}
+            displayedSoSCount={displayedRedPlayerSoSCount}>
+          </PlayerSettingsSection>
         </ThreeColumnLayout.RightColumn>
       </ThreeColumnLayout>
     </main>

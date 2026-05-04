@@ -120,7 +120,7 @@ const BoardCell = ({
 
   return (
     <div
-      className="border-2 border-solid border-black"
+      className="border-2 border-solid"
       data-cellindex={`${rowIndex} ${columnIndex}`}
     >
       <button

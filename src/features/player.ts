@@ -5,12 +5,14 @@ export class Player {
     private playerName: string
     public isComputer: boolean
     private playerSymbol: string
+    public playerColor: "blue" | "red"
     public sosCount: number
 
-    constructor(playerName: string, playerSymbol: string, isComputer: boolean = false){
+    constructor(playerName: string, playerSymbol: string, playerColor: "blue" | "red", isComputer: boolean = false){
         this.playerName = playerName
         this.isComputer = isComputer
         this.playerSymbol = playerSymbol
+        this.playerColor = playerColor
         this.sosCount = 0
     }
     
@@ -38,8 +40,8 @@ export class ComputerPlayer extends Player {
     public switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void;
     public setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>
     
-    constructor(playerName: string, playerSymbol: string, isComputer: boolean, sosGame: SoSGame, cellComponents: RefObject<HTMLDivElement | null>, setDisplayedPlayersSoSCount: React.Dispatch<React.SetStateAction<number>>[], switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void, setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>) {
-        super(playerName, playerSymbol, isComputer);
+    constructor(playerName: string, playerSymbol: string, playerColor: "blue" | "red", isComputer: boolean, sosGame: SoSGame, cellComponents: RefObject<HTMLDivElement | null>, setDisplayedPlayersSoSCount: React.Dispatch<React.SetStateAction<number>>[], switchDisplayedPlayersTurn: (nextPlayerTurn: Player) => void, setDisplayedWinner: React.Dispatch<React.SetStateAction<Player | undefined>>) {
+        super(playerName, playerSymbol, playerColor, isComputer);
         this.sosGame = sosGame
         this.cellComponents = cellComponents
         this.setDisplayedPlayersSoSCount = setDisplayedPlayersSoSCount

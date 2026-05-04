@@ -111,6 +111,8 @@
 }
 
 @layer base {
+  @import "./styles//global_styles.css";
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -119,3 +121,23 @@
   }
 }
 
+@theme {
+  /* Text Sizes */
+  --text-5xl: 2.986rem;
+  --text-4xl: 2.488rem;
+  --text-3xl: 2.074rem;
+  --text-2xl: 1.728rem;
+  --text-xl: 1.44rem;
+  --text-large: 1.2rem;
+  --text-medium: 1rem;
+  --text-small: 0.833rem;
+  --text-xs: 0.694rem;
+
+  /* Font Family */
+  --font-primary: 'Satoshi', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  --font-accent: 'Cabinet Grotesk', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+
+  /* Font Weight */
+  --font-weight-normal: 500;
+  --font-weight-extrabold: 800;
+} 

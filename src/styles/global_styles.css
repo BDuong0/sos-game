@@ -1,0 +1,85 @@
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@500&f[]=cabinet-grotesk@800&display=swap");
+
+body {
+  --base-font-size: var(--text-medium);
+  --base-line-height: 1.6;
+  --rhythm-unit: calc(var(--base-font-size) * var(--base-line-height));
+
+  --background: #0a0a0a;
+  --foreground: white;
+  font-size: var(--base-font-size);
+  line-height: var(--base-line-height);
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-normal);
+}
+
+p, ul, ol, figure {
+  margin-bottom: var(--rhythm-unit);
+}
+
+ul, ol {
+  padding-left: var(--rhythm-unit);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-accent);
+  font-weight: var(--font-weight-extrabold);
+}
+
+h1 {
+  --h1-font-size: var(--text-5xl);
+  font-size: var(--h1-font-size);
+  line-height: calc(3 * var(--rhythm-unit));
+  margin-top: calc(3 * var(--rhythm-unit));
+  margin-bottom: var(--rhythm-unit);
+}
+
+h2 {
+  --h2-font-size: var(--text-4xl);
+  font-size: var(--h2-font-size);
+  line-height: calc(2 * var(--rhythm-unit));
+  margin-top: calc(2 * var(--rhythm-unit));
+  margin-bottom: var(--rhythm-unit);
+}
+
+h3 {
+  --h3-font-size: var(--text-3xl);
+  font-size: var(--h3-font-size);
+  line-height: calc(2 * var(--rhythm-unit));
+  margin-top: calc(2 * var(--rhythm-unit));
+  margin-bottom: var(--rhythm-unit);
+}
+
+h4 {
+  --h4-font-size: var(--text-2xl);
+  font-size: var(--h4-font-size);
+  line-height: calc(1 * var(--rhythm-unit));
+  margin-top: calc(1 * var(--rhythm-unit));
+  margin-bottom: var(--rhythm-unit);
+}
+
+h5 {
+  --h5-font-size: var(--text-xl);
+  font-size: var(--h5-font-size);
+  line-height: calc(1 * var(--rhythm-unit));
+  margin-top: calc(1 * var(--rhythm-unit));
+  margin-bottom: var(--rhythm-unit);
+}
+
+h6 {
+  --h6-font-size: var(--text-large);
+  font-size: var(--h6-font-size);
+  line-height: calc(1 * var(--rhythm-unit));
+  margin-top: calc(1 * var(--rhythm-unit));
+  margin-bottom: var(--rhythm-unit);
+}
+
+button:hover, input:hover, select:hover {
+  cursor: pointer;
+  background-color: #404040;
+}
