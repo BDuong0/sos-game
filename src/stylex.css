@@ -1,0 +1,8 @@
+@stylex;
+
+ /* Niche Use Case: Use both StyleX styles and inline styles in a React app for both dev and build
+    - Problem CSS styles declared via the inline style attribute work in dev, but disappear during build
+    Step 1: Configure the 4-inline fix inside .babelrc (the babel side of StyleX)
+    Step 2: Move the '@styleX;' to a separate CSS file "src/stylex.css" and import that CSS file (i.e import '../stylex.css';) only in files where you explicitly use StyleX.
+        - The PostCSS part of StyleX only runs in files that import "src/stylex.css" and not globally
+ */
