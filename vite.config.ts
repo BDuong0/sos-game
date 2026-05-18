@@ -13,6 +13,7 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  base: "/sos-game",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

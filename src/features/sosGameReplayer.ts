@@ -48,7 +48,7 @@ export class SoSGameReplayer {
         reader.onload = () => {        
             const text = reader.result 
             
-            const [gameSettings, recordedTurns] = (text as string).split(/\n\s*\n/)
+            const [gameSettings, _recordedTurns] = (text as string).split(/\n\s*\n/)
 
             let settings: string[] | string[][] = gameSettings.split('\n')
             for (let i = 0; i < settings.length; i++){
@@ -61,13 +61,13 @@ export class SoSGameReplayer {
                 return [settingName, settingValue]
             })
 
-            const [[gameMode, gameModeValue],
-            [boardSize, boardSizeValue],
-            [playerOneName, playerOneNameValue],
-            [playerOneType, playerOneTypeValue],
-            [playerTwoName, playerTwoNameValue],
-            [playerTwoType, playerTwoTypeValue],
-            [winnerName, winnerNameValue]] = settings
+            const [[_gameMode, gameModeValue],
+            [_boardSize, boardSizeValue],
+            [_playerOneName, _playerOneNameValue],
+            [_playerOneType, _playerOneTypeValue],
+            [_playerTwoName, _playerTwoNameValue],
+            [_playerTwoType, playerTwoTypeValue],
+            [_winnerName, _winnerNameValue]] = settings
 
             let bluePlayer = this.sosGameToRender.getPlayers()[0]
             let redPlayer = this.sosGameToRender.getPlayers()[1]
@@ -80,6 +80,7 @@ export class SoSGameReplayer {
                 redPlayer = new ComputerPlayer(
                     redPlayer.getPlayerName(),
                     redPlayer.getPlayerSymbol(),
+                    "red",
                     true,
                     this.sosGameToRender,
                     this.cellComponents, 
@@ -88,7 +89,7 @@ export class SoSGameReplayer {
                     this.setDisplayedWinner
                 )
             } else if (redPlayer instanceof ComputerPlayer && playerTwoTypeValue == "HUMAN") {
-                redPlayer = new Player("Red Player", "O");
+                redPlayer = new Player("Red Player", "O", "red");
             }
 
             this.players = [bluePlayer, redPlayer]
@@ -125,7 +126,7 @@ export class SoSGameReplayer {
         reader.onload = () => {
             const text = reader.result 
             
-            let [gameSettings, recordedMoves] = (text as string).split(/\n\s*\n/)
+            let [_gameSettings, recordedMoves] = (text as string).split(/\n\s*\n/)
 
             const recordedTurns = recordedMoves.split(' ')
             recordedTurns.pop() // Remove the ' ' at the end of recordedTurns before it was recordedTurns.split(' )

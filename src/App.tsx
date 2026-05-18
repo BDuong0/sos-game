@@ -218,7 +218,7 @@ function App() {
   const rightAndLeftColumnStyles = "grid place-items-center"
   return (
     <main>
-      <ThreeColumnLayout layoutLevel="root" gap="16px" className="h-screen">
+      <ThreeColumnLayout layoutLevel="root" gap="12px" className="h-screen">
         <ThreeColumnLayout.LeftColumn columnPercent={25} className={rightAndLeftColumnStyles}>
           <PlayerSettingsSection
             player={bluePlayer} 
@@ -232,11 +232,11 @@ function App() {
           </PlayerSettingsSection>
         </ThreeColumnLayout.LeftColumn>
 
-        <ThreeColumnLayout.MiddleColumn columnPercent={50} className="grid place-items-center">
-          <div className="w-4/5">
+        <ThreeColumnLayout.MiddleColumn columnPercent={40} className="grid place-items-center">
+          <div className="w-11/12">
             <div className="text-center">
               <h1 className="mt-0">SOS game</h1>
-              <p>A variant of the Tic Tac Toe game</p>
+              <p>A variant of the Tic Tac Toe game. Hover, over the game mode next to "Current Game Mode" for a brief explaination of the SOS game</p>
             </div>
             <h4>Game Settings:</h4>
             <div className="flex gap-6">

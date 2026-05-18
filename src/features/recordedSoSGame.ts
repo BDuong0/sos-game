@@ -6,7 +6,7 @@ export class RecordedSoSGame {
     private sosGame: SoSGame
     private recordedMoves: string
     private recordedGameSettings: string
-    private sosTurnRecorder
+    public readonly sosTurnRecorder
     private textFileContent: string
     private fileName: string
     
